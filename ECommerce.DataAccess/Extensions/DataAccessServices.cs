@@ -23,7 +23,7 @@ namespace ECommerce.DataAccess.Extensions
 
             // Veritabanına mock veri ekleme
             var seedDatabase = new ContextSeed(services.BuildServiceProvider());
-            await seedDatabase.SeedDatabaseAsync();
+            //await seedDatabase.SeedDatabaseAsync();
 
             return services;
         }

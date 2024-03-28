@@ -8,8 +8,6 @@ namespace ECommerce.Business.Validations.FluentValidations.Auth
         public LoginDtoValidator()
         {
             RuleFor(_ => _.Mail)
-                .NotNull()
-                .WithMessage("Mail adresi boş olamaz.")
                 .NotEmpty()
                 .WithMessage("Mail adresi boş olamaz")
                 .MinimumLength(12)
@@ -18,12 +16,10 @@ namespace ECommerce.Business.Validations.FluentValidations.Auth
                 .WithMessage("Mail adresi en fazla 50 karakter içermelidir.");
 
             RuleFor(_ => _.Password)
-                .NotNull()
-                .WithMessage("Şifre boş olamaz.")
                 .NotEmpty()
                 .WithMessage("Şifre boş olamaz")
-                .MinimumLength(7)
-                .WithMessage("Şifre en az 7 karakter içermelidir.")
+                .MinimumLength(2)
+                .WithMessage("Şifre en az 2 karakter içermelidir.")
                 .MaximumLength(25)
                 .WithMessage("Şifre en fazla 25 karakter içermelidir.");
         }

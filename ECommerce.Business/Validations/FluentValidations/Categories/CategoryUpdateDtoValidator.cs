@@ -8,14 +8,10 @@ namespace ECommerce.Business.Validations.FluentValidations.Categories
         public CategoryUpdateDtoValidator()
         {
             RuleFor(_ => _.Id)
-               .NotNull()
-               .WithMessage("Id boş olamaz.")
                .NotEmpty()
                .WithMessage("Id boş olamaz.");
 
             RuleFor(_ => _.Name)
-               .NotNull()
-               .WithMessage("Kategory ismi boş olamaz.")
                .NotEmpty()
                .WithMessage("Kategory ismi boş olamaz.")
                .MinimumLength(2)

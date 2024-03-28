@@ -55,10 +55,6 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
                 .WithOne(u => u.User)
                 .HasForeignKey<PaymentCard>(o => o.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasMany(u => u.Orders)
-                .WithOne(u => u.User)
-                .HasForeignKey(u => u.UserId);
         }
     }
 }

@@ -2,6 +2,7 @@ using ECommerce.Api.Extensions;
 using ECommerce.Business.Extensions;
 using ECommerce.Core.Exceptions;
 using ECommerce.DataAccess.Extensions;
+using ECommerce.DataAccess.Repositories.Contexts;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Text.Json;
 
@@ -18,6 +19,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    await new ContextSeed(builder.Services.BuildServiceProvider()).SeedDatabaseAsync();
 }
 //app.UseSentryTracing();
 

@@ -111,7 +111,5 @@ namespace ECommerce.Business.Services.Authentication
             if (!user.IsValid)
                 await _userWriteService.ActivateUserAsync(user.Id.ToString());
         }
-
-
     }
 }

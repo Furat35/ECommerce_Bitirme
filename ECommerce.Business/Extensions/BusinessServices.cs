@@ -1,4 +1,6 @@
 ﻿using ECommerce.Business.Helpers.TokenServices;
+using ECommerce.Business.Services.Addresses;
+using ECommerce.Business.Services.Addresses.Abstract;
 using ECommerce.Business.Services.Authentication;
 using ECommerce.Business.Services.Authentication.Abstract;
 using ECommerce.Business.Services.Brands;
@@ -45,6 +47,7 @@ namespace ECommerce.Business.Extensions
             services.AddScoped<ICartReadService, CartReadService>();
             services.AddScoped<ICartWriteService, CartWriteService>();
             services.AddScoped<IUserWriteService, UserWriteService>();
+            services.AddScoped<IAddressReadService, AddressReadService>();
             services.AddScoped<IAuthWriteService, AuthWriteService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IPasswordGenerationService, PasswordGenerationService>();

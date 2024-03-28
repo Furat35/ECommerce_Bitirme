@@ -8,14 +8,10 @@ namespace ECommerce.Business.Validations.FluentValidations.Products
         public ProductUpdateDtoValidator()
         {
             RuleFor(_ => _.Id)
-                .NotNull()
-                .WithMessage("Ürün id'si boş olamaz.")
                 .NotEmpty()
                 .WithMessage("Ürün id'si boş olamaz.");
 
             RuleFor(_ => _.ProductName)
-                .NotNull()
-                .WithMessage("Ürün ismi boş olamaz.")
                 .NotEmpty()
                 .WithMessage("Ürün ismi boş olamaz.")
                 .MinimumLength(2)
@@ -24,8 +20,6 @@ namespace ECommerce.Business.Validations.FluentValidations.Products
                 .WithMessage("Ürün ismi en fazle 50 karakter içermelidir.");
 
             RuleFor(_ => _.SubProductName)
-               .NotNull()
-               .WithMessage("Ürün alt kategorisi boş olamaz.")
                .NotEmpty()
                .WithMessage("Ürün alt kategorisi boş olamaz.")
                .MinimumLength(2)
@@ -34,8 +28,6 @@ namespace ECommerce.Business.Validations.FluentValidations.Products
                .WithMessage("Ürün alt kategorisi en fazle 50 karakter içermelidir.");
 
             RuleFor(_ => _.ProductDescription)
-               .NotNull()
-               .WithMessage("Ürün açıklaması boş olamaz.")
                .NotEmpty()
                .WithMessage("Ürün açıklaması boş olamaz.")
                .MinimumLength(2)
@@ -44,8 +36,6 @@ namespace ECommerce.Business.Validations.FluentValidations.Products
                .WithMessage("Ürün açıklaması en fazle 200 karakter içermelidir.");
 
             RuleFor(_ => _.Price)
-                .NotNull()
-                .WithMessage("Ürün fiyatı boş olamaz.")
                 .NotEmpty()
                 .WithMessage("Ürün fiyatı boş olamaz.")
                 .GreaterThan(0)

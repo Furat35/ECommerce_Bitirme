@@ -8,21 +8,15 @@ namespace ECommerce.Business.Validations.FluentValidations.SubCategories
         public SubCategoryUpdateDtoValidator()
         {
             RuleFor(_ => _.Id)
-                .NotEmpty()
-                .WithMessage("Alt Kategori id'si boş olamaz.")
                 .NotNull()
                 .WithMessage("Alt Kategori id'si boş olamaz.");
 
             RuleFor(_ => _.CategoryId)
                 .NotEmpty()
-                .WithMessage("Kategori id'si boş olamaz.")
-                .NotNull()
                 .WithMessage("Kategori id'si boş olamaz.");
 
             RuleFor(_ => _.Name)
                .NotEmpty()
-               .WithMessage("Alt Kategori ismi boş olamaz.")
-               .NotNull()
                .WithMessage("Alt Kategori ismi boş olamaz.")
                .MinimumLength(2)
                .WithMessage("Alt Kategori ismi en az 2 karakter içermelidir.")

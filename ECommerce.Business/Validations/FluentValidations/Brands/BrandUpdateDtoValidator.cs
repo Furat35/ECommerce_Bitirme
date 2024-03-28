@@ -8,14 +8,10 @@ namespace ECommerce.Business.Validations.FluentValidations.Brands
         public BrandUpdateDtoValidator()
         {
             RuleFor(_ => _.Id)
-               .NotNull()
-               .WithMessage("Marka ismi boş olamaz.")
                .NotEmpty()
                .WithMessage("Marka ismi boş olamaz.");
 
             RuleFor(_ => _.Name)
-               .NotNull()
-               .WithMessage("Marka ismi boş olamaz.")
                .NotEmpty()
                .WithMessage("Marka ismi boş olamaz.")
                .MinimumLength(2)

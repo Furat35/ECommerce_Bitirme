@@ -15,10 +15,6 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
             builder.Property(p => p.Name)
                     .IsRequired()
                     .HasMaxLength(50);
-
-            builder.HasMany(c => c.SubCategories)
-                .WithOne(c => c.Category)
-                .HasForeignKey(c => c.CategoryId);
         }
     }
 }

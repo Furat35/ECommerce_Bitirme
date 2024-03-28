@@ -8,8 +8,6 @@ namespace ECommerce.Business.Validations.FluentValidations.PaymentCards
         public PaymentCardAddDtoValidator()
         {
             RuleFor(_ => _.NameSurname)
-                .NotNull()
-                .WithMessage("Ad soyad boş olamaz.")
                 .NotEmpty()
                 .WithMessage("Ad soyad boş olamaz.")
                 .MinimumLength(5)
@@ -18,24 +16,18 @@ namespace ECommerce.Business.Validations.FluentValidations.PaymentCards
                 .WithMessage("Ad Soyad en fazle 70 karakter içermelidir.");
 
             RuleFor(_ => _.CardNumber)
-                .NotNull()
-                .WithMessage("Kart numarası boş olamaz.")
                 .NotEmpty()
                 .WithMessage("Kart numarası boş olamaz.")
                 .Length(16)
                 .WithMessage("Kart numarası 16 karakter içermelidir.");
 
             RuleFor(_ => _.CVV)
-               .NotNull()
-               .WithMessage("CVV boş olamaz.")
                .NotEmpty()
                .WithMessage("CVV boş olamaz.")
                .Length(3)
                .WithMessage("CVV 3 karakter içermelidir.");
 
             RuleFor(_ => _.ExpireDate)
-               .NotNull()
-               .WithMessage("Geçerlilik tarihi boş olamaz.")
                .NotEmpty()
                .WithMessage("Geçerlilik tarihi boş olmaz.");
         }

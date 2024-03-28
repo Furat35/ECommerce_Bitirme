@@ -10,10 +10,7 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
         {
             builder.ToTable("PaymentCards");
 
-            builder.HasOne(u => u.User)
-                .WithOne(u => u.PaymentCard)
-                .HasForeignKey<PaymentCard>(o => o.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.HasKey(_ => _.Id);
 
             builder.Property(_ => _.NameSurname)
                 .IsRequired()

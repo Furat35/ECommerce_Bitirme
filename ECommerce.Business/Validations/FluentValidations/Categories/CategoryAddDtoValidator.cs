@@ -8,8 +8,6 @@ namespace ECommerce.Business.Validations.FluentValidations.Categories
         public CategoryAddDtoValidator()
         {
             RuleFor(_ => _.Name)
-               .NotNull()
-               .WithMessage("Kategory ismi boş olamaz.")
                .NotEmpty()
                .WithMessage("Kategory ismi boş olamaz.")
                .MinimumLength(2)

@@ -1,6 +1,10 @@
 ﻿using ECommerce.Business.ActionFilters;
 using ECommerce.Business.Helpers.Users;
+using ECommerce.Business.Models.Dtos.Addresses;
+using ECommerce.Business.Models.Dtos.Products;
 using ECommerce.Business.Services.Users.Abstract;
+using ECommerce.Business.Validations.FluentValidations.Addresses;
+using ECommerce.Business.Validations.FluentValidations.Products;
 using ECommerce.Core.Consts;
 using ECommerce.Core.Exceptions;
 using ECommerce.Core.Extensions;
@@ -82,12 +86,26 @@ namespace ECommerce.Api.Controllers
         /// </summary>
         /// <param name="password">Yeni şifre</param>
         /// <returns>Ok</returns>
-        [HttpPut(Name = "UpdatePassword")]
+        [HttpPut("password",Name = "UpdatePassword")]
         [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["password"])]
         [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company},{RoleConsts.User}")]
-        public async Task<IActionResult> UpdatePassword(string password)
+        public async Task<IActionResult> UpdatePassword([FromBody] string password)
         {
             var updateResult = await _userWriteService.UpdateUserPasswordAsync(password);
+            return Ok(updateResult);
+        }
+
+        /// <summary>
+        /// Adres güncelleme
+        /// </summary>
+        /// <param name="address">Yeni adres</param>
+        /// <returns>Ok</returns>
+        [HttpPut("address")]
+        [TypeFilter(typeof(FluentValidationFilterAttribute<AddressUpdateDtoValidator, AddressUpdateDto>), Arguments = ["address"])]
+        //[Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company},{RoleConsts.User}")]
+        public async Task<IActionResult> UpdateAddress([FromBody] AddressUpdateDto address)
+        {
+            var updateResult = await _userWriteService.UpdateAddress(address);
             return Ok(updateResult);
         }
 

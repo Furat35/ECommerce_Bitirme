@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using ECommerce.Business.Models.Dtos.Addresses;
 using ECommerce.Business.Models.Dtos.Users;
+using ECommerce.Business.Services.Addresses.Abstract;
 using ECommerce.Business.Services.Users.Abstract;
 using ECommerce.Core.DataAccess.Repositories.Abstract;
 using ECommerce.Core.Exceptions;
@@ -9,6 +11,8 @@ using ECommerce.DataAccess.UnitOfWorks;
 using ECommerce.Entity.Entities;
 using ECommerce.Entity.Enums;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using System.Text;
 
 namespace ECommerce.Business.Services.Users
@@ -20,7 +24,6 @@ namespace ECommerce.Business.Services.Users
         private readonly IUserReadService _userReadService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPasswordGenerationService _passwordGenerationService;
-
         public UserWriteService(IMapper mapper, IUnitOfWork unitOfWork, IUserReadService userReadService,
             IHttpContextAccessor httpContextAccessor, IPasswordGenerationService passwordGenerationService)
         {
@@ -66,6 +69,18 @@ namespace ECommerce.Business.Services.Users
             user.PasswordSalt = storedSalt;
             _userWriteRepository.Update(user);
 
+            return await SaveChangesAsync();
+        }
+
+        public async Task<bool> UpdateAddress(AddressUpdateDto addressUpdateDto)
+        {
+            var user = await _userReadService.Users.GetWhere(_ => _.Id == Guid.Parse(_httpContextAccessor.HttpContext.User.GetActiveUserId()), includeProperties: [_ => _.Address]).FirstOrDefaultAsync();
+            if (user.Address is null)
+                user.Address = _mapper.Map<Address>(addressUpdateDto);
+            else
+                _mapper.Map(addressUpdateDto, user.Address);
+
+            _userWriteRepository.Update(user);
             return await SaveChangesAsync();
         }
 

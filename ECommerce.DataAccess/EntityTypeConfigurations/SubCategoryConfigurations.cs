@@ -18,16 +18,6 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
 
             builder.Property(s => s.CategoryId)
                 .IsRequired();
-
-            builder.HasOne(s => s.Category)
-                .WithMany(s => s.SubCategories)
-                .HasForeignKey(s => s.CategoryId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(s => s.Products)
-                .WithOne(s => s.SubCategory)
-                .HasForeignKey(s => s.SubCategoryId);
-
         }
     }
 }

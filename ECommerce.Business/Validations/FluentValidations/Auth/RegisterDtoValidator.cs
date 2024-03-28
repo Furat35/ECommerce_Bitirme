@@ -8,8 +8,6 @@ namespace ECommerce.Business.Validations.FluentValidations.Auth
         public RegisterDtoValidator()
         {
             RuleFor(_ => _.Name)
-                .NotNull()
-                .WithMessage("İsim boş olamaz.")
                 .NotEmpty()
                 .WithMessage("İsim boş olamaz.")
                 .MinimumLength(2)
@@ -18,8 +16,6 @@ namespace ECommerce.Business.Validations.FluentValidations.Auth
                 .WithMessage("İsim en fazla 50 karakter içermelidir.");
 
             RuleFor(_ => _.Surname)
-               .NotNull()
-               .WithMessage("Soyad boş olamaz.")
                .NotEmpty()
                .WithMessage("Soyad boş olamaz.")
                .MinimumLength(2)
@@ -28,7 +24,7 @@ namespace ECommerce.Business.Validations.FluentValidations.Auth
                .WithMessage("Soyad en fazla 50 karakter içermelidir.");
 
             RuleFor(_ => _.Mail)
-               .NotNull()
+               .NotEmpty()
                .WithMessage("Mail boş olamaz.")
                .MinimumLength(12)
                .WithMessage("Mail en az 12 karakter içermelidir.")
@@ -36,10 +32,10 @@ namespace ECommerce.Business.Validations.FluentValidations.Auth
                .WithMessage("Mail en fazla 50 karakter içermelidir.");
 
             RuleFor(_ => _.Password)
-                .NotNull()
+                .NotEmpty()
                 .WithMessage("Şifre boş olamaz.")
-                .MinimumLength(7)
-                .WithMessage("Şifre en az 7 karakter içermelidir.")
+                .MinimumLength(2)
+                .WithMessage("Şifre en az 2 karakter içermelidir.")
                 .MaximumLength(25)
                 .WithMessage("Şifre en fazla 25 karakter içermelidir.");
         }
