@@ -15,10 +15,7 @@ namespace ECommerce.Api.Extensions
             {
                 opt.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
             });
-            //    .AddJsonOptions(opt =>
-            //{
-            //    opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-            //});
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
             services.AddAuthentication(options =>
@@ -39,6 +36,17 @@ namespace ECommerce.Api.Extensions
                             ClockSkew = TimeSpan.Zero
                         };
                     });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
 
             #region Rate limit implementasyonu
             services.AddMemoryCache();
@@ -70,6 +78,5 @@ namespace ECommerce.Api.Extensions
 
             return services;
         }
-
     }
 }

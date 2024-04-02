@@ -1,12 +1,15 @@
 ﻿using ECommerce.Business.ActionFilters;
 using ECommerce.Business.Models.Dtos.Auth;
-using ECommerce.Business.Services.Authentication.Abstract;
+using ECommerce.Business.Services.Contracts.IWriteServices;
 using ECommerce.Business.Validations.FluentValidations.Auth;
 using ECommerce.Entity.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers
 {
+    /// <summary>
+    /// Authentication ve Authorization işlemlerinin yapılmasını sağlayan endpointleri içermektedir.
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
@@ -36,7 +39,7 @@ namespace ECommerce.Api.Controllers
         /// Kullanıcı üye olma
         /// </summary>
         /// <param name="user">Üye olacak kullanıcı bilgileri</param>
-        /// <returns>Ok</returns>
+        /// <returns>İşlemin başarılı olma durumu</returns>
         [HttpPost("register/user", Name = "RegisterUser")]
         [TypeFilter(typeof(FluentValidationFilterAttribute<RegisterDtoValidator, RegisterDto>), Arguments = ["user"])]
         public async Task<IActionResult> RegisterUser(RegisterDto user)
@@ -48,8 +51,8 @@ namespace ECommerce.Api.Controllers
         /// <summary>
         /// Şirket üye olma
         /// </summary>
-        /// <param name="user">Üye olacak kullanıcı bilgileri</param>
-        /// <returns>Ok</returns>
+        /// <param name="user">Üye olacak şirket bilgileri</param>
+        /// <returns>İşlemin başarılı olma durumu</returns>
         [HttpPost("register/company", Name = "RegisterCompany")]
         [TypeFilter(typeof(FluentValidationFilterAttribute<RegisterDtoValidator, RegisterDto>), Arguments = ["user"])]
         public async Task<IActionResult> RegisterCompany(RegisterDto user)

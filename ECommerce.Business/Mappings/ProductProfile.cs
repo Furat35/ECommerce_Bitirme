@@ -11,6 +11,7 @@ namespace ECommerce.Business.Mappings
             CreateMap<ProductAddDto, Product>();
             CreateMap<ProductUpdateDto, Product>();
             CreateMap<Product, ProductListDto>();
+            CreateMap<ProductListDto, OrderItemProduct>().ForMember(_ => _.Id, opt => opt.Ignore());
         }
     }
 }

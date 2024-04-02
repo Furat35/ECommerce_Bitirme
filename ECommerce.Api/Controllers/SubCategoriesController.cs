@@ -1,7 +1,8 @@
 ﻿using ECommerce.Business.ActionFilters;
 using ECommerce.Business.Helpers.SubCategories;
 using ECommerce.Business.Models.Dtos.SubCategories;
-using ECommerce.Business.Services.SubCategories.Abstract;
+using ECommerce.Business.Services.Contracts.IReadServices;
+using ECommerce.Business.Services.Contracts.IWriteServices;
 using ECommerce.Business.Validations.FluentValidations.SubCategories;
 using ECommerce.Core.Consts;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers
 {
+    /// <summary>
+    /// Alt kategori ile ilgili işlemleri enpointleri içermektedir.
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
@@ -24,10 +28,10 @@ namespace ECommerce.Api.Controllers
         }
 
         /// <summary>
-        /// Alt Kategoriler getiriliyor.
+        /// Alt Kategoriler getiriliyor
         /// </summary>
         /// <param name="subCategoryRequestFilter">Alt Kategori filtreleri</param>
-        /// <returns>Alt Kategoriler getirilmektedir.</returns>
+        /// <returns>Alt Kategoriler getirilmektedir</returns>
         [HttpGet(Name = "GetSubCategories")]
         [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["categoryId"])]
         public IActionResult GetSubCategories([FromQuery] SubCategoryRequestFilter subCategoryRequestFilter, [FromQuery] string categoryId)
@@ -37,7 +41,7 @@ namespace ECommerce.Api.Controllers
         }
 
         /// <summary>
-        /// Verilen id'ye sahip alt kategori getirilmektedir.
+        /// Verilen id'ye sahip alt kategori getirilmektedir
         /// </summary>
         /// <param name="id">Alt kategori id'si</param>
         /// <returns>Verilen id'deki kategori</returns>
@@ -85,10 +89,10 @@ namespace ECommerce.Api.Controllers
         [HttpDelete("{id}", Name = "DeleteSubCategory")]
         [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         [Authorize(Roles = $"{RoleConsts.Admin}")]
-        public async Task<IActionResult> DeleteCategory(string id)
+        public async Task<IActionResult> DeleteCSubategory(string id)
         {
-            var result = await _subCategoryWriteService.SafeRemoveSubCategoryAsync(id);
-            return Ok(result);
+            var isRemoved = await _subCategoryWriteService.SafeRemoveSubCategoryAsync(id);
+            return Ok(isRemoved);
         }
     }
 }

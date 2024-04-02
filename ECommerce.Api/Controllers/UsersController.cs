@@ -1,10 +1,9 @@
 ﻿using ECommerce.Business.ActionFilters;
 using ECommerce.Business.Helpers.Users;
 using ECommerce.Business.Models.Dtos.Addresses;
-using ECommerce.Business.Models.Dtos.Products;
-using ECommerce.Business.Services.Users.Abstract;
+using ECommerce.Business.Services.Contracts.IReadServices;
+using ECommerce.Business.Services.Contracts.IWriteServices;
 using ECommerce.Business.Validations.FluentValidations.Addresses;
-using ECommerce.Business.Validations.FluentValidations.Products;
 using ECommerce.Core.Consts;
 using ECommerce.Core.Exceptions;
 using ECommerce.Core.Extensions;
@@ -13,6 +12,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers
 {
+    /// <summary>
+    /// Kullanıcı crud işlemleri ile ilgili endpointleri içermektedir.
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
@@ -37,7 +39,7 @@ namespace ECommerce.Api.Controllers
         [Authorize(Roles = $"{RoleConsts.Admin}")]
         public IActionResult GetUsers([FromQuery] UserRequestFilter userRequestFilter)
         {
-            var users = _userReadService.GetUsersWhere(userRequestFilter);
+            var users = _userReadService.GetUsersWhere(userRequestFilter, _ => _.IsValid == userRequestFilter.IsValid);
             return Ok(users);
         }
 
@@ -85,8 +87,8 @@ namespace ECommerce.Api.Controllers
         /// Şifre güncelleme
         /// </summary>
         /// <param name="password">Yeni şifre</param>
-        /// <returns>Ok</returns>
-        [HttpPut("password",Name = "UpdatePassword")]
+        /// <returns>İşlem başarılı olup olmadığı</returns>
+        [HttpPut("password", Name = "UpdatePassword")]
         [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["password"])]
         [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company},{RoleConsts.User}")]
         public async Task<IActionResult> UpdatePassword([FromBody] string password)
@@ -99,10 +101,10 @@ namespace ECommerce.Api.Controllers
         /// Adres güncelleme
         /// </summary>
         /// <param name="address">Yeni adres</param>
-        /// <returns>Ok</returns>
+        /// <returns>İşlemin başarılı olup olmadığı</returns>
         [HttpPut("address")]
         [TypeFilter(typeof(FluentValidationFilterAttribute<AddressUpdateDtoValidator, AddressUpdateDto>), Arguments = ["address"])]
-        //[Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company},{RoleConsts.User}")]
+        [Authorize(Roles = $"{RoleConsts.Company},{RoleConsts.User}")]
         public async Task<IActionResult> UpdateAddress([FromBody] AddressUpdateDto address)
         {
             var updateResult = await _userWriteService.UpdateAddress(address);
@@ -113,7 +115,7 @@ namespace ECommerce.Api.Controllers
         /// Kullanıcı aktifleştirme
         /// </summary>
         /// <param name="id">Kullanıcı id'si</param>
-        /// <returns>Ok</returns>
+        /// <returns>İşlemin başarılı olup olmadığı</returns>
         [HttpPut("{id}", Name = "ActivateUser")]
         [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company},{RoleConsts.User}")]

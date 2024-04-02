@@ -21,8 +21,12 @@ namespace ECommerce.Business.Helpers.FilterServices
 
         public ProductResponse<List<SubCategoryListDto>> FilterCategories(SubCategoryRequestFilter filters)
         {
-
-            Metadata metadata = new(filters.Page, filters.PageSize, _subCategories.Count(), _subCategories.Count() / filters.PageSize + 1);
+            int pageNumber;
+            if (_subCategories.Count() > filters.PageSize)
+                pageNumber = _subCategories.Count() % filters.PageSize == 0 ? _subCategories.Count() / filters.PageSize : _subCategories.Count() / filters.PageSize + 1;
+            else
+                pageNumber = 1;
+            Metadata metadata = new(filters.Page, filters.PageSize, _subCategories.Count(), pageNumber);
             _subCategories = AddPagination(filters);
             var header = new CustomHeaders().AddPaginationHeader(metadata);
             var mappedCategorys = _mapper.Map<List<SubCategoryListDto>>(_subCategories);

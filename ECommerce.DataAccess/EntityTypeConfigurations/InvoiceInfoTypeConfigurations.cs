@@ -1,11 +1,6 @@
 ﻿using ECommerce.Entity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerce.DataAccess.EntityTypeConfigurations
 {
@@ -13,7 +8,20 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<InvoiceInfo> builder)
         {
+            builder.ToTable("InvoiceInfos");
+
             builder.HasKey(_ => _.Id);
+
+            builder.Property(_ => _.ClientFullName)
+                .IsRequired();
+            builder.Property(_ => _.ClientPhone)
+                .IsRequired();
+            builder.Property(_ => _.TotalPrice)
+                .IsRequired();
+
+            builder.Ignore(_ => _.ModifiedDate);
+            builder.Ignore(_ => _.DeletedDate);
+            builder.Ignore(_ => _.IsValid);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using ECommerce.Business.ActionFilters;
 using ECommerce.Business.Models.Dtos.PaymentCards;
-using ECommerce.Business.Services.PaymentCards.Abstract;
+using ECommerce.Business.Services.Contracts.IReadServices;
+using ECommerce.Business.Services.Contracts.IWriteServices;
 using ECommerce.Business.Validations.FluentValidations.PaymentCards;
 using ECommerce.Core.Consts;
 using ECommerce.Core.Extensions;
@@ -9,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers
 {
+    /// <summary>
+    /// Kullanıcı ödeme kartı ile ilgili gerekli endpointleri içermektedir.
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
@@ -19,7 +23,8 @@ namespace ECommerce.Api.Controllers
         private readonly IPaymentCardWriteService _paymentCardWriteService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PaymentCardsController(IPaymentCardReadService paymentCardReadService, IPaymentCardWriteService paymentCardWriteService, IHttpContextAccessor httpContextAccessor)
+        public PaymentCardsController(IPaymentCardReadService paymentCardReadService,
+            IPaymentCardWriteService paymentCardWriteService, IHttpContextAccessor httpContextAccessor)
         {
             _paymentCardReadService = paymentCardReadService;
             _paymentCardWriteService = paymentCardWriteService;
@@ -31,7 +36,7 @@ namespace ECommerce.Api.Controllers
         /// </summary>
         /// <returns>Verilen id'deki kart</returns>
         [HttpGet(Name = "GetPaymentCardById")]
-        [Authorize(Roles = $"{RoleConsts.User},{RoleConsts.Company}")]
+        [Authorize(Roles = $"{RoleConsts.User}")]
         public async Task<IActionResult> GetPaymentCard()
         {
             var paymentCard = await _paymentCardReadService.GetPaymentCardByUserIdAsync(_httpContextAccessor.HttpContext.User.GetActiveUserId());
@@ -44,7 +49,7 @@ namespace ECommerce.Api.Controllers
         /// <param name="paymentCard">Eklenecek kart detayları</param>
         /// <returns>Eklenen kart</returns>
         [HttpPost(Name = "AddPaymentCard")]
-        [Authorize(Roles = $"{RoleConsts.User},{RoleConsts.Company}")]
+        [Authorize(Roles = $"{RoleConsts.User}")]
         [TypeFilter(typeof(FluentValidationFilterAttribute<PaymentCardAddDtoValidator, PaymentCardAddDto>), Arguments = ["paymentCard"])]
         public async Task<IActionResult> AddPaymentCard([FromBody] PaymentCardAddDto paymentCard)
         {
@@ -59,7 +64,7 @@ namespace ECommerce.Api.Controllers
         /// <returns>Güncellenen kart</returns>
         [HttpPut(Name = "UpdatePaymentCard")]
         [TypeFilter(typeof(FluentValidationFilterAttribute<PaymentCardUpdateDtoValidator, PaymentCardUpdateDto>), Arguments = ["paymentCard"])]
-        [Authorize(Roles = $"{RoleConsts.User},{RoleConsts.Company}")]
+        [Authorize(Roles = $"{RoleConsts.User}")]
         public async Task<IActionResult> UpdatePaymentCard([FromBody] PaymentCardUpdateDto paymentCard)
         {
             await _paymentCardWriteService.UpdatePaymentCardAsync(paymentCard);

@@ -21,10 +21,6 @@ namespace ECommerce.DataAccess.Extensions
             services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));
             services.AddSingleton<ContextSeed>();
 
-            // Veritabanına mock veri ekleme
-            var seedDatabase = new ContextSeed(services.BuildServiceProvider());
-            //await seedDatabase.SeedDatabaseAsync();
-
             return services;
         }
     }

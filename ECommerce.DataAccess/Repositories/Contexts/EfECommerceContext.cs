@@ -13,47 +13,7 @@ namespace ECommerce.DataAccess.Repositories.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-            #region Veritabanına maplenmemesi gereken propertyler
-            modelBuilder.Entity<Cart>()
-                .Ignore(b => b.IsValid);
-            modelBuilder.Entity<Cart>()
-                .Ignore(b => b.DeletedDate);
-
-            modelBuilder.Entity<OrderStatus>()
-               .Ignore(b => b.ModifiedDate);
-            modelBuilder.Entity<OrderStatus>()
-                 .Ignore(b => b.DeletedDate);
-            modelBuilder.Entity<OrderStatus>()
-                .Ignore(b => b.IsValid);
-
-            modelBuilder.Entity<OrderItemStatus>()
-                .Ignore(b => b.ModifiedDate);
-            modelBuilder.Entity<OrderItemStatus>()
-                 .Ignore(b => b.DeletedDate);
-            modelBuilder.Entity<OrderItemStatus>()
-                .Ignore(b => b.IsValid);
-
-            modelBuilder.Entity<InvoiceInfo>()
-               .Ignore(b => b.ModifiedDate);
-            modelBuilder.Entity<InvoiceInfo>()
-                 .Ignore(b => b.DeletedDate);
-            modelBuilder.Entity<InvoiceInfo>()
-                .Ignore(b => b.IsValid);
-
-            modelBuilder.Entity<OrderPaymentDetail>()
-               .Ignore(b => b.ModifiedDate);
-            modelBuilder.Entity<OrderPaymentDetail>()
-                 .Ignore(b => b.DeletedDate);
-            modelBuilder.Entity<OrderPaymentDetail>()
-                .Ignore(b => b.IsValid);
-
-            modelBuilder.Entity<OrderPaymentDetail>()
-                .Ignore(b => b.IsValid);
-            #endregion
-
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(EfECommerceContext).Assembly);
-
             base.OnModelCreating(modelBuilder);
         }
 
@@ -112,5 +72,6 @@ namespace ECommerce.DataAccess.Repositories.Contexts
         public DbSet<ProductPhoto> ProductPhotos { get; set; }
         public DbSet<ShippingPlace> ShippingPlaces { get; set; }
         public DbSet<SubCategory> SubCategories { get; set; }
+        public DbSet<OrderItemProduct> OrderItemProducts { get; set; }
     }
 }

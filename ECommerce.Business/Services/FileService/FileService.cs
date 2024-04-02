@@ -9,7 +9,7 @@ namespace ECommerce.Business.Services.ImageService
                 throw new ArgumentException("Geçersiz dosya");
 
             var currentDirectory = Directory.GetCurrentDirectory();
-            var uploadsFolder = Path.Combine(currentDirectory, "uploads", folderNameToUpload);
+            var uploadsFolder = Path.Combine(currentDirectory, "wwwroot", "uploads", folderNameToUpload);
 
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
@@ -22,36 +22,36 @@ namespace ECommerce.Business.Services.ImageService
                 await file.CopyToAsync(fileStream);
             }
 
-            return uniqueFileName;
+            return Path.Combine("wwwroot", "uploads", folderNameToUpload, uniqueFileName);
         }
 
-        public void RemoveFile(string folderName, string fileName)
+        public void RemoveFile(string filePath)
         {
-            if (string.IsNullOrEmpty(folderName) || string.IsNullOrEmpty(fileName))
+            if (string.IsNullOrEmpty(filePath) || string.IsNullOrEmpty(filePath))
                 throw new ArgumentException("Geçersiz dosya adı");
 
             var currentDirectory = Directory.GetCurrentDirectory();
-            var filePath = Path.Combine(currentDirectory, "uploads", folderName);
+            var fileToDelete = Path.Combine(currentDirectory, filePath);
 
-            if (File.Exists(filePath))
-                File.Delete(filePath);
+            if (File.Exists(fileToDelete))
+                File.Delete(fileToDelete);
             else
                 throw new FileNotFoundException($"Dosya bulunamadı: {filePath}");
         }
 
-        public byte[] GetImage(string folderName, string fileName)
+        public string GetImage(string filePath)
         {
-            if (string.IsNullOrEmpty(fileName))
+            if (string.IsNullOrEmpty(filePath))
             {
                 throw new ArgumentException("Invalid file name");
             }
 
             var currentDirectory = Directory.GetCurrentDirectory();
-            var filePath = Path.Combine(currentDirectory, "uploads", folderName);
+            var fileToGet = Path.Combine(currentDirectory, filePath);
 
-            if (File.Exists(filePath))
+            if (File.Exists(fileToGet))
             {
-                return File.ReadAllBytes(filePath);
+                return Convert.ToBase64String(File.ReadAllBytes(fileToGet));
             }
             else
             {

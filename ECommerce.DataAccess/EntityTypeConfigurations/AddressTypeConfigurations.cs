@@ -1,11 +1,6 @@
 ﻿using ECommerce.Entity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerce.DataAccess.EntityTypeConfigurations
 {
@@ -13,7 +8,22 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<Address> builder)
         {
+            builder.ToTable("Addresses");
+
             builder.HasKey(_ => _.Id);
+
+            builder.Property(_ => _.Neighborhood)
+                .IsRequired();
+            builder.Property(_ => _.Street)
+               .IsRequired();
+            builder.Property(_ => _.Address1)
+               .IsRequired();
+            builder.Property(_ => _.Address2)
+               .IsRequired();
+            builder.Property(_ => _.DistrictId)
+               .IsRequired();
+            builder.Property(_ => _.UserId)
+               .IsRequired();
         }
     }
 }

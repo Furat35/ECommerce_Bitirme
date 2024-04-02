@@ -9,6 +9,7 @@ namespace ECommerce.Business.Mappings
         public CartItemProfile()
         {
             CreateMap<CartItem, CartItemListDto>();
+            CreateMap<CartItemListDto, OrderItem>();
         }
     }
 }

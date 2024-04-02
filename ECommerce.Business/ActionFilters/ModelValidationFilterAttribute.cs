@@ -5,10 +5,10 @@ namespace ECommerce.Business.ActionFilters
 {
     public class ModelValidationFilterAttribute : IActionFilter
     {
-        private readonly string _key;
-        public ModelValidationFilterAttribute(string key)
+        private readonly string[] _keys;
+        public ModelValidationFilterAttribute(string[] keys)
         {
-            _key = key;
+            _keys = keys;
         }
         public void OnActionExecuting(ActionExecutingContext context)
         {
@@ -27,16 +27,22 @@ namespace ECommerce.Business.ActionFilters
 
         public void BodyArgumentValidation(ActionExecutingContext context)
         {
-            var body = context.ActionArguments.FirstOrDefault(context => context.Key == _key);
-            if (body.Key != null && body.Value == null)
-                throw new BadRequestException($"{body.Key} boş olamaz!");
+            foreach (var key in _keys)
+            {
+                var body = context.ActionArguments.FirstOrDefault(context => context.Key == key);
+                if (body.Key != null && body.Value == null)
+                    throw new BadRequestException($"{body.Key} boş olamaz!");
+            }
         }
 
         public void QueryAndRouteParameterValidation(ActionExecutingContext context)
         {
-            var parameter = context.ModelState.FirstOrDefault(_ => _.Key == _key);
-            if (parameter.Value == null || parameter.Key != null && parameter.Value?.ValidationState != Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid)
-                throw new BadRequestException($"{_key} boş olamaz!");
+            foreach (var key in _keys)
+            {
+                var parameter = context.ModelState.FirstOrDefault(_ => _.Key == key);
+                if (parameter.Value == null || parameter.Key != null && parameter.Value?.ValidationState != Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Valid)
+                    throw new BadRequestException($"{_keys} boş olamaz!");
+            }
         }
     }
 }

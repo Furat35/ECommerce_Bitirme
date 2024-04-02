@@ -29,7 +29,12 @@ namespace ECommerce.Business.Helpers.FilterServices
             if (filters.SubCategory.HasValue)
                 _products = GetBySubCategory(filters.SubCategory.Value);
 
-            Metadata metadata = new(filters.Page, filters.PageSize, _products.Count(), _products.Count() / filters.PageSize + 1);
+            int pageNumber;
+            if (_products.Count() > filters.PageSize)
+                pageNumber = _products.Count() % filters.PageSize == 0 ? _products.Count() / filters.PageSize : _products.Count() / filters.PageSize + 1;
+            else
+                pageNumber = 1;
+            Metadata metadata = new(filters.Page, filters.PageSize, _products.Count(), pageNumber);
             _products = AddPagination(filters);
             var header = new CustomHeaders().AddPaginationHeader(metadata);
             var mappedProducts = _mapper.Map<List<ProductListDto>>(_products);

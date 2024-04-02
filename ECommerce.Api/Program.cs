@@ -57,6 +57,7 @@ app.UseExceptionHandler(
     }
 );
 #endregion
+app.UseCors("AllowAll");
 
 //app.UseIpRateLimiting();
 

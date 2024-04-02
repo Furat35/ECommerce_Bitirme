@@ -7,9 +7,11 @@ namespace ECommerce.Core.DataAccess.Repositories.Abstract
     {
         Task<bool> AddAsync(TEntity model);
         Task<bool> AddRangeAsync(List<TEntity> models);
-        bool SafeRemove(TEntity model);
-        bool Update(TEntity model);
-        Task<int> SaveAsync();
+        Task<bool> SafeRemoveAsync(TEntity model);
+        Task<bool> RemoveAsync(TEntity model);
+        Task<bool> RemoveRangeAsync(List<TEntity> models);
+        Task<bool> UpdateAsync(TEntity model);
+        Task<bool> SaveChangesAsync();
     }
 
 }

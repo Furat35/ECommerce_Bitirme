@@ -23,4 +23,9 @@
     <ProjectReference Include="..\ECommerce.Business\ECommerce.Business.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\" />
+    <Folder Include="wwwroot\uploads\productimages\" />
+  </ItemGroup>
+
 </Project>

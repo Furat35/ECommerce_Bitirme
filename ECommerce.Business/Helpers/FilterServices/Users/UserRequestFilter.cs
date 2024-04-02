@@ -6,5 +6,6 @@ namespace ECommerce.Business.Helpers.Users
     {
         public string? Name { get; set; }
         public string? Mail { get; set; }
+        public bool IsValid { get; set; } = true;
     }
 }

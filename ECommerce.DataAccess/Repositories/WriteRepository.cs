@@ -2,7 +2,6 @@
 using ECommerce.Core.Entities.Abstract;
 using ECommerce.DataAccess.Repositories.Contexts;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace ECommerce.DataAccess.Repositories
 {
@@ -19,30 +18,43 @@ namespace ECommerce.DataAccess.Repositories
 
         public async Task<bool> AddAsync(TEntity model)
         {
-            EntityEntry<TEntity> entry = await Table.AddAsync(model);
-            return entry.State == EntityState.Added;
+            await Table.AddAsync(model);
+            return await SaveChangesAsync();
         }
 
         public async Task<bool> AddRangeAsync(List<TEntity> models)
         {
             await Table.AddRangeAsync(models);
-            return true;
+            return await SaveChangesAsync();
         }
 
-        public bool SafeRemove(TEntity model)
+        public async Task<bool> SafeRemoveAsync(TEntity model)
         {
+            model.DeletedDate = DateTime.UtcNow;
             model.IsValid = false;
-            EntityEntry<TEntity> entry = Table.Update(model);
-            return entry.State == EntityState.Deleted;
+            Table.Update(model);
+            return await SaveChangesAsync();
         }
 
-        public bool Update(TEntity model)
+        public async Task<bool> RemoveAsync(TEntity model)
         {
-            EntityEntry<TEntity> entry = Table.Update(model);
-            return entry.State == EntityState.Modified;
+            Table.Remove(model);
+            return await SaveChangesAsync();
         }
 
-        public async Task<int> SaveAsync()
-            => await _context.SaveChangesAsync();
+        public async Task<bool> RemoveRangeAsync(List<TEntity> models)
+        {
+            Table.RemoveRange(models);
+            return await SaveChangesAsync();
+        }
+
+        public async Task<bool> UpdateAsync(TEntity model)
+        {
+            Table.Update(model);
+            return await SaveChangesAsync();
+        }
+
+        public async Task<bool> SaveChangesAsync()
+            => await _context.SaveChangesAsync() != 0;
     }
 }

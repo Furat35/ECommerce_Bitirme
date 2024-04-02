@@ -23,7 +23,12 @@ namespace ECommerce.Business.Helpers.FilterServices
             _users = NameStartsWith(filters.Name);
             _users = MailStartsWith(filters.Mail);
 
-            Metadata metadata = new(filters.Page, filters.PageSize, _users.Count(), _users.Count() / filters.PageSize + 1);
+            int pageNumber;
+            if (_users.Count() > filters.PageSize)
+                pageNumber = _users.Count() % filters.PageSize == 0 ? _users.Count() / filters.PageSize : _users.Count() / filters.PageSize + 1;
+            else
+                pageNumber = 1;
+            Metadata metadata = new(filters.Page, filters.PageSize, _users.Count(), pageNumber);
             _users = AddPagination(filters);
             var header = new CustomHeaders().AddPaginationHeader(metadata);
             var mappedProducts = _mapper.Map<List<UserListDto>>(_users);

@@ -1,7 +1,8 @@
 ﻿using ECommerce.Business.ActionFilters;
 using ECommerce.Business.Helpers.Categories;
 using ECommerce.Business.Models.Dtos.Categories;
-using ECommerce.Business.Services.Categories.Abstract;
+using ECommerce.Business.Services.Contracts.IReadServices;
+using ECommerce.Business.Services.Contracts.IWriteServices;
 using ECommerce.Business.Validations.FluentValidations.Categories;
 using ECommerce.Core.Consts;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers
 {
+    /// <summary>
+    /// Kategori ile ilgili crud işlemlerini yapmak için gerekli endpointleri içermektedir.
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
@@ -24,19 +28,19 @@ namespace ECommerce.Api.Controllers
         }
 
         /// <summary>
-        /// Kategoriler getiriliyor.
+        /// Kategoriler getiriliyor
         /// </summary>
         /// <param name="categoryRequestFilter">Kategori filtreleri</param>
-        /// <returns>Kategoriler getirilmektedir.</returns>
+        /// <returns>Kategoriler getirilmektedir</returns>
         [HttpGet(Name = "GetCategories")]
         public IActionResult GetCategories([FromQuery] CategoryRequestFilter categoryRequestFilter)
         {
-            var categorys = _categoryReadService.GetCategoriesWhere(categoryRequestFilter, _ => _.IsValid);
-            return Ok(categorys);
+            var categories = _categoryReadService.GetCategoriesWhere(categoryRequestFilter, _ => _.IsValid);
+            return Ok(categories);
         }
 
         /// <summary>
-        /// Verilen id'ye sahip kategori getirilmektedir.
+        /// Verilen id'ye sahip kategori getirilmektedir
         /// </summary>
         /// <param name="id">Kategori id'si</param>
         /// <returns>Verilen id'deki kategori</returns>
@@ -80,15 +84,15 @@ namespace ECommerce.Api.Controllers
         /// <summary>
         /// Kategori silme
         /// </summary>
-        /// <param name="id">Silinecek kategori</param>
+        /// <param name="id">Silinecek kategori id'si</param>
         /// <returns>Ok</returns>
         [HttpDelete("{id}", Name = "DeleteCategory")]
         [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         [Authorize(Roles = $"{RoleConsts.Admin}")]
         public async Task<IActionResult> DeleteCategory(string id)
         {
-            var result = await _categoryWriteService.SafeRemoveCategoryAsync(id);
-            return Ok(result);
+            var isRemoved = await _categoryWriteService.SafeRemoveCategoryAsync(id);
+            return Ok(isRemoved);
         }
     }
 }

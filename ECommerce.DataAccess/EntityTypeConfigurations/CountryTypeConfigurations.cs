@@ -1,11 +1,6 @@
 ﻿using ECommerce.Entity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerce.DataAccess.EntityTypeConfigurations
 {
@@ -16,6 +11,8 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
             builder.ToTable("Countries");
 
             builder.HasKey(_ => _.Id);
+            builder.Property(_ => _.CountryName)
+                .IsRequired();
 
             builder.Ignore(_ => _.CreatedDate);
             builder.Ignore(_ => _.ModifiedDate);

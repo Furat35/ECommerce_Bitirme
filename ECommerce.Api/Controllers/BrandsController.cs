@@ -1,7 +1,8 @@
 ﻿using ECommerce.Business.ActionFilters;
 using ECommerce.Business.Helpers.Brands;
 using ECommerce.Business.Models.Dtos.Brands;
-using ECommerce.Business.Services.Brands.Abstract;
+using ECommerce.Business.Services.Contracts.IReadServices;
+using ECommerce.Business.Services.Contracts.IWriteServices;
 using ECommerce.Business.Validations.FluentValidations.Brands;
 using ECommerce.Core.Consts;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers
 {
+    /// <summary>
+    /// Bir ürün markası için gerekli crud işlemlerinin yapıldığı endpointleri içermektedir.
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
@@ -24,10 +28,10 @@ namespace ECommerce.Api.Controllers
         }
 
         /// <summary>
-        /// Markalar getiriliyor.
+        /// Markalar getiriliyor
         /// </summary>
         /// <param name="brandRequestFilter">Marka filterleri</param>
-        /// <returns>Markalar getirilmektedir.</returns>
+        /// <returns>Markalar getirilmektedir</returns>
         [HttpGet(Name = "GetBrands")]
         public IActionResult GetBrands([FromQuery] BrandRequestFilter brandRequestFilter)
         {
@@ -36,7 +40,7 @@ namespace ECommerce.Api.Controllers
         }
 
         /// <summary>
-        /// Verilen id'ye sahip marka getirilmektedir.
+        /// Verilen id'ye sahip marka getirilmektedir
         /// </summary>
         /// <param name="id">Marka id'si</param>
         /// <returns>Verilen id'deki marka</returns>
@@ -54,7 +58,7 @@ namespace ECommerce.Api.Controllers
         /// <param name="brand">Eklenecek marka detayları</param>
         /// <returns>Eklenen marka</returns>
         [HttpPost(Name = "AddBrand")]
-        [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company}")]
+        [Authorize(Roles = $"{RoleConsts.Admin}")]
         [TypeFilter(typeof(FluentValidationFilterAttribute<BrandAddDtoValidator, BrandAddDto>), Arguments = ["brand"])]
         public async Task<IActionResult> AddBrand([FromBody] BrandAddDto brand)
         {
@@ -69,11 +73,11 @@ namespace ECommerce.Api.Controllers
         /// <returns>Güncellenen marka</returns>
         [HttpPut(Name = "UpdateBrand")]
         [TypeFilter(typeof(FluentValidationFilterAttribute<BrandUpdateDtoValidator, BrandUpdateDto>), Arguments = ["brand"])]
-        [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company}")]
+        [Authorize(Roles = $"{RoleConsts.Admin}")]
         public async Task<IActionResult> UpdateBrand([FromBody] BrandUpdateDto brand)
         {
-            await _brandWriteService.UpdateBrandAsync(brand);
-            return Ok(brand);
+            bool isUpdated = await _brandWriteService.UpdateBrandAsync(brand);
+            return Ok(isUpdated);
         }
 
         /// <summary>
@@ -83,11 +87,11 @@ namespace ECommerce.Api.Controllers
         /// <returns>Ok</returns>
         [HttpDelete("{id}", Name = "DeleteBrand")]
         [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
-        [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company}")]
+        [Authorize(Roles = $"{RoleConsts.Admin}")]
         public async Task<IActionResult> DeleteBrand(string id)
         {
-            await _brandWriteService.SafeRemoveBrandAsync(id);
-            return Ok();
+            bool isRemoved = await _brandWriteService.SafeRemoveBrandAsync(id);
+            return Ok(isRemoved);
         }
     }
 }

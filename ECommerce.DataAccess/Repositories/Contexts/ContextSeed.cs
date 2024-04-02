@@ -1,7 +1,5 @@
-﻿using ECommerce.Core.Helpers.PasswordServices;
-using ECommerce.Entity.Entities;
+﻿using ECommerce.Entity.Entities;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text;
 
 namespace ECommerce.DataAccess.Repositories.Contexts
 {
@@ -20,12 +18,17 @@ namespace ECommerce.DataAccess.Repositories.Contexts
             {
                 var context = scope.ServiceProvider.GetRequiredService<EfECommerceContext>();
                 context.Database.EnsureCreated();
+                if (!context.Users.Any())
+                {
+                    await context.Users.AddRangeAsync(SeedUsersTable());
+                    context.SaveChanges();
+                }
                 if (!context.Products.Any())
                 {
                     await context.Products.AddRangeAsync(SeedProductsTable());
                     context.SaveChanges();
                 }
-                if(!context.Countries.Any())
+                if (!context.Countries.Any())
                 {
                     await context.Countries.AddRangeAsync(SeedCountriesTable());
                     context.SaveChanges();
@@ -43,10 +46,20 @@ namespace ECommerce.DataAccess.Repositories.Contexts
             }
         }
 
+        private List<User> SeedUsersTable()
+            => new List<User>
+            {
+                new User{ Id = Guid.Parse("48df4af4-aa79-45f2-755c-08dc51134e88"), Name = "Fırat", Surname = "Ortaç", Mail = "furat@gmail.com", Phone = "5375655978",
+                    Password = "war/WAa0EzB/LCXYZnjXzWp/nZ5DxsExyKhXhSM5HEI=", PasswordSalt = "bzl9bkpd2l3s2N/yWbMFww==", Role = Entity.Enums.Role.Company,
+                    Company = new Company{ Mail = "rewr@gmail.com", CompanyName = "test comp", AboutCompany = "about comp", Phone= "52325523"} , CreatedDate = DateTime.Now, IsValid = true},
+                  new User{ Id = Guid.Parse("121EAB18-CA1E-475A-B5E1-06871BB5D8D1"), Name = "Comp", Surname = "Ortaç", Mail = "comp@gmail.com", Phone = "5375655978", Password = "war/WAa0EzB/LCXYZnjXzWp/nZ5DxsExyKhXhSM5HEI=", PasswordSalt = "bzl9bkpd2l3s2N/yWbMFww==",
+                    Role = Entity.Enums.Role.Company, CreatedDate = DateTime.Now, IsValid = true}
+            };
+
         private List<Product> SeedProductsTable()
             => new List<Product>
             {
-                new Product{ ProductName = "İPhone 15", SubProductName = "256 gb siyah", UserId = Guid.Parse("121EAB18-CA1E-475A-B5E1-06871BB5D8D1"),
+                new Product{ ProductName = "İPhone 15", SubProductName = "256 gb siyah", CreatedBy = Guid.Parse("48DF4AF4-AA79-45F2-755C-08DC51134E88"),
                     ProductDescription = "Özellikleri vs.", Stock = 50, Price = 222,
                     SubCategory = new SubCategory{Name = "Telefon", IsValid = true, CreatedDate = DateTime.Now,
                     Category = new Category{ Name = "Elektronik", IsValid = true, CreatedDate = DateTime.Now}},

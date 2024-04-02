@@ -1,7 +1,8 @@
 ﻿using ECommerce.Business.ActionFilters;
 using ECommerce.Business.Helpers.Products;
 using ECommerce.Business.Models.Dtos.Products;
-using ECommerce.Business.Services.Products.Abstract;
+using ECommerce.Business.Services.Contracts.IReadServices;
+using ECommerce.Business.Services.Contracts.IWriteServices;
 using ECommerce.Business.Validations.FluentValidations.Products;
 using ECommerce.Core.Consts;
 using ECommerce.Core.Exceptions;
@@ -11,6 +12,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers
 {
+    /// <summary>
+    /// Ürün işlemleri için gerekli endpointleri içermektedir.
+    /// </summary>
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
@@ -26,19 +30,19 @@ namespace ECommerce.Api.Controllers
         }
 
         /// <summary>
-        /// Ürünler getiriliyor.
+        /// Ürünler getiriliyor
         /// </summary>
         /// <param name="productRequestFilter">Ürün filterleri</param>
-        /// <returns>Ürünler getirilmektedir.</returns>
+        /// <returns>Ürünler getirilmektedir</returns>
         [HttpGet(Name = "GetProducts")]
         public IActionResult GetProducts([FromQuery] ProductRequestFilter productRequestFilter)
         {
             var products = _productReadService.GetProductsWhere(productRequestFilter, _ => _.IsValid);
-            return Ok(products);
+            return Ok(products.FirstOrDefault().Images);
         }
 
         /// <summary>
-        /// Verilen id'ye sahip ürün getirilmektedir.
+        /// Verilen id'ye sahip ürün getirilmektedir
         /// </summary>
         /// <param name="id">Ürün id'si</param>
         /// <returns>Verilen id'deki ürün</returns>
@@ -53,15 +57,48 @@ namespace ECommerce.Api.Controllers
         /// <summary>
         /// Ürün ekleme
         /// </summary>
-        /// <param name="product">Ürün detayları</param>
+        /// <param name="product">Eklenecek ürün detayları</param>
         /// <returns>Eklenen ürün</returns>
         [HttpPost(Name = "AddProduct")]
         [Authorize(Roles = $"{RoleConsts.Company}")]
         [TypeFilter(typeof(FluentValidationFilterAttribute<ProductAddDtoValidator, ProductAddDto>), Arguments = ["product"])]
-        public async Task<IActionResult> AddProduct([FromBody] ProductAddDto product)
+        public async Task<IActionResult> AddProduct([FromForm] ProductAddDto product)
         {
             var response = await _productWriteService.AddProductAsync(product);
             return CreatedAtRoute("GetProductById", new { id = response.Id }, response);
+        }
+
+        /// <summary>
+        /// Ürün foroğrafı ekleme
+        /// </summary>
+        /// <param name="productId">Fotoğrafı eklenecek ürünün id'si</param>
+        /// <returns>Ok</returns>
+        [HttpPost("img/{productId}")]
+        [Authorize(Roles = $"{RoleConsts.Company}")]
+        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["productId"])]
+        public async Task<IActionResult> UploadProductPhoto(string productId)
+        {
+            await IsCompaniesProduct(productId);
+            bool isUploaded = await _productWriteService.UploadProductPhoto(productId);
+
+            return Ok(isUploaded);
+        }
+
+        /// <summary>
+        /// Ürün foroğrafı silme
+        /// </summary>
+        /// <param name="productId">Fotoğrafı silinecek ürünün id'si</param>
+        /// <param name="imageId">Fotoğrafı silinecek fotoğraf</param>
+        /// <returns>Ok</returns>
+        [HttpDelete("img/{productId}/{imageId}")]
+        [Authorize(Roles = $"{RoleConsts.Company}")]
+        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = new object[] { new string[] { "productId", "imageId" } })]
+        public async Task<IActionResult> RemoveProductPhoto(string productId, string imageId)
+        {
+            await IsCompaniesProduct(productId);
+            bool isRemoved = await _productWriteService.RemoveProductPhoto(productId, imageId);
+
+            return Ok(isRemoved);
         }
 
         /// <summary>
@@ -74,10 +111,9 @@ namespace ECommerce.Api.Controllers
         [Authorize(Roles = $"{RoleConsts.Company}")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductUpdateDto product)
         {
-            if (!await _productWriteService.IsProductCreatedByUserAsync(product.Id.ToString(), HttpContext.User.GetActiveUserId()))
-                throw new ForbiddenException();
-
+            await IsCompaniesProduct(product.Id.ToString());
             await _productWriteService.UpdateProductAsync(product);
+
             return Ok(product);
         }
 
@@ -91,7 +127,7 @@ namespace ECommerce.Api.Controllers
         [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company}")]
         public async Task<IActionResult> DeleteProduct(string id)
         {
-            if (await _productWriteService.IsProductCreatedByUserAsync(id, HttpContext.User.GetActiveUserId())
+            if (await _productReadService.IsCompaniesProduct(id, HttpContext.User.GetActiveUserId())
                 || User.IsInRole(RoleConsts.Admin))
             {
                 await _productWriteService.SafeRemoveProductAsync(id);
@@ -99,6 +135,13 @@ namespace ECommerce.Api.Controllers
             }
 
             throw new ForbiddenException();
+        }
+
+        private async Task IsCompaniesProduct(string productId)
+        {
+            bool isCompaniesProduct = await _productReadService.IsCompaniesProduct(productId, HttpContext.User.GetActiveUserId());
+            if (!isCompaniesProduct)
+                throw new ForbiddenException();
         }
     }
 }
