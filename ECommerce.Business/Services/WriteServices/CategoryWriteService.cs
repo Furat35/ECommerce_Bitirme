@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Business.Extensions;
 using ECommerce.Business.Models.Dtos.Categories;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Business.Services.Contracts.IWriteServices;
@@ -6,6 +7,7 @@ using ECommerce.Core.DataAccess.Repositories.Abstract;
 using ECommerce.Core.Exceptions;
 using ECommerce.DataAccess.UnitOfWorks;
 using ECommerce.Entity.Entities;
+using FluentValidation;
 
 namespace ECommerce.Business.Services.WriteServices
 {
@@ -14,18 +16,24 @@ namespace ECommerce.Business.Services.WriteServices
         private readonly IWriteRepository<Category> _categoryWriteRepository;
         private readonly ICategoryReadService _categoryReadService;
         private readonly IMapper _mapper;
-
-        public CategoryWriteService(IUnitOfWork unitOfWork, IMapper mapper, ICategoryReadService categoryReadService)
+        private readonly IValidator<CategoryAddDto> _categoryAddDtoValidator;
+        private readonly IValidator<CategoryUpdateDto> _categoryUpdateDtoValidator;
+        public CategoryWriteService(IUnitOfWork unitOfWork, IMapper mapper, ICategoryReadService categoryReadService,
+            IValidator<CategoryAddDto> categoryAddDtoValidator, IValidator<CategoryUpdateDto> categoryUpdateDtoValidator)
         {
             _categoryWriteRepository = unitOfWork.GetWriteRepository<Category>();
             _mapper = mapper;
             _categoryReadService = categoryReadService;
+            _categoryAddDtoValidator = categoryAddDtoValidator;
+            _categoryUpdateDtoValidator = categoryUpdateDtoValidator;
         }
 
         public async Task<CategoryListDto> AddCategoryAsync(CategoryAddDto category)
         {
+            await CustomFluentValidationErrorHandling.ValidateAndThrowAsync(category, _categoryAddDtoValidator);
             await ActivateCategoryIfDeleted(category.Name);
             var categoryToAdd = _mapper.Map<Category>(category);
+            categoryToAdd.IsValid = true;
             bool isAdded = await _categoryWriteRepository.AddAsync(categoryToAdd);
 
             return isAdded ? _mapper.Map<CategoryListDto>(categoryToAdd) : null;
@@ -39,6 +47,7 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> UpdateCategoryAsync(CategoryUpdateDto category)
         {
+            await CustomFluentValidationErrorHandling.ValidateAndThrowAsync(category, _categoryUpdateDtoValidator);
             await ActivateCategoryIfDeleted(category.Name.ToString());
             var categoryToUpdate = await GetSingleCategory(category.Id);
             _mapper.Map(category, categoryToUpdate);
@@ -68,6 +77,7 @@ namespace ECommerce.Business.Services.WriteServices
 
         private async Task<Category> GetSingleCategory(string categoryId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(categoryId);
             var category = await _categoryReadService.Categories.GetByIdAsync(categoryId);
             return category is null || !category.IsValid
                 ? throw new NotFoundException("Kategori bulunamadı!")

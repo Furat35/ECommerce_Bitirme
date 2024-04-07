@@ -22,8 +22,6 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
                .IsRequired();
             builder.Property(_ => _.DistrictId)
                .IsRequired();
-            builder.Property(_ => _.UserId)
-               .IsRequired();
         }
     }
 }

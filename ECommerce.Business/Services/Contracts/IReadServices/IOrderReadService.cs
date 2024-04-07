@@ -1,10 +1,15 @@
-﻿using ECommerce.Core.DataAccess.Repositories.Abstract;
+﻿using ECommerce.Business.Helpers.FilterServices.Orders;
+using ECommerce.Business.Models.Dtos.Orders;
+using ECommerce.Core.DataAccess.Repositories.Abstract;
 using ECommerce.Entity.Entities;
 
 namespace ECommerce.Business.Services.Contracts.IReadServices
 {
     public interface IOrderReadService
     {
-        public IReadRepository<Order> Orders { get; }
+        IReadRepository<Order> Orders { get; }
+        Task<List<OrderListDto>> GetOrdersWithGivenStatus(OrderRequestFilter filters, string userId);
+        Task<OrderListDto> GetOrderById(string orderId);
+        Task<bool> CheckIfOrderIsCreatedByGivenUser(string orderId, string userId);
     }
 }

@@ -12,10 +12,8 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
 
             builder.HasKey(_ => _.Id);
 
-            builder.Ignore(_ => _.CreatedDate);
             builder.Ignore(_ => _.ModifiedDate);
             builder.Ignore(_ => _.DeletedDate);
-            builder.Ignore(_ => _.IsValid);
         }
     }
 }

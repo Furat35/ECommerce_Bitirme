@@ -1,10 +1,12 @@
-﻿using ECommerce.Business.Models.Dtos.CartItems;
+﻿using ECommerce.Business.Extensions;
+using ECommerce.Business.Models.Dtos.CartItems;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Business.Services.Contracts.IWriteServices;
 using ECommerce.Core.DataAccess.Repositories.Abstract;
 using ECommerce.Core.Exceptions;
 using ECommerce.DataAccess.UnitOfWorks;
 using ECommerce.Entity.Entities;
+using FluentValidation;
 
 namespace ECommerce.Business.Services.WriteServices
 {
@@ -14,19 +16,22 @@ namespace ECommerce.Business.Services.WriteServices
         private readonly IProductReadService _productReadService;
         private readonly ICartReadService _cartReadService;
         private readonly IUserReadService _userReadService;
+        private readonly IValidator<CartItemAddDto> _cartItemAddDtoValidator;
 
         public CartWriteService(IUnitOfWork unitOfWork, ICartReadService cartReadService, IProductReadService productReadService,
-            IUserReadService userReadService)
+            IUserReadService userReadService, IValidator<CartItemAddDto> cartItemAddDtoValidator)
         {
             _cartWriteRepository = unitOfWork.GetWriteRepository<Cart>();
             _cartReadService = cartReadService;
             _productReadService = productReadService;
             _userReadService = userReadService;
+            _cartItemAddDtoValidator = cartItemAddDtoValidator;
         }
 
         public async Task<bool> AddItemToCart(CartItemAddDto cartItemAddDto, string userId)
         {
-            var cart = await _cartReadService.Carts.GetSingleAsync(_ => _.UserId.ToString() == userId, includeProperties: _ => _.CartItems);
+            await CustomFluentValidationErrorHandling.ValidateAndThrowAsync(cartItemAddDto, _cartItemAddDtoValidator);
+            var cart = await _cartReadService.Carts.GetSingleAsync(_ => _.Id.ToString() == userId, includeProperties: _ => _.CartItems);
             var cartItems = cart.CartItems.FirstOrDefault(_ => _.ProductId.ToString().Equals(cartItemAddDto.ProductId, StringComparison.InvariantCultureIgnoreCase));
             if (cartItems != null)
                 cartItems.Quantity += cartItemAddDto.Quantity;
@@ -37,6 +42,7 @@ namespace ECommerce.Business.Services.WriteServices
                 {
                     ProductId = product.Id,
                     Quantity = cartItemAddDto.Quantity,
+                    IsValid = true
                 };
                 cart.CartItems.Add(newCartItem);
             }
@@ -46,8 +52,11 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> RemoveItemFromCart(string productId, string userId)
         {
-            var cart = await _cartReadService.Carts.GetSingleAsync(_ => _.UserId.ToString() == userId, includeProperties: _ => _.CartItems);
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(productId, userId);
+            var cart = await _cartReadService.Carts.GetSingleAsync(_ => _.Id.ToString() == userId, includeProperties: _ => _.CartItems);
             var cartItem = cart.CartItems.FirstOrDefault(_ => _.ProductId.ToString().Equals(productId, StringComparison.InvariantCultureIgnoreCase));
+            if (cartItem is null)
+                return false;
             cart.CartItems.Remove(cartItem);
 
             return await _cartWriteRepository.UpdateAsync(cart);
@@ -55,8 +64,14 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> DecreaseItemQuantity(string productId, int quantity, string userId)
         {
-            var cart = await _cartReadService.Carts.GetSingleAsync(_ => _.UserId.ToString() == userId, includeProperties: _ => _.CartItems);
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(productId, userId);
+            if (quantity <= 0)
+                throw new BadRequestException("Geçersiz miktar girildi! Tekrar giriniz!");
+
+            var cart = await _cartReadService.Carts.GetSingleAsync(_ => _.Id.ToString() == userId, includeProperties: _ => _.CartItems);
             var cartItem = cart.CartItems.FirstOrDefault(_ => _.ProductId.ToString().Equals(productId, StringComparison.InvariantCultureIgnoreCase));
+            if (cartItem is null)
+                return false;
             cartItem.Quantity = quantity;
 
             return await _cartWriteRepository.UpdateAsync(cart);
@@ -65,7 +80,8 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> ClearCart(string userId)
         {
-            var cart = await _cartReadService.Carts.GetSingleAsync(_ => _.UserId.ToString() == userId, includeProperties: _ => _.CartItems);
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(userId);
+            var cart = await _cartReadService.Carts.GetSingleAsync(_ => _.Id.ToString() == userId, includeProperties: _ => _.CartItems);
             if (cart is null)
                 return false;
             cart.CartItems.Clear();
@@ -75,7 +91,8 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> CreateCartAsync(string userId)
         {
-            var cart = await _cartReadService.Carts.GetSingleAsync(_ => _.UserId.ToString().Equals(userId, StringComparison.InvariantCultureIgnoreCase));
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(userId);
+            var cart = await _cartReadService.Carts.GetSingleAsync(_ => _.Id.ToString().Equals(userId, StringComparison.InvariantCultureIgnoreCase));
             if (cart != null)
                 throw new BadRequestException("Sepet önceden oluşturulmuştu!");
 

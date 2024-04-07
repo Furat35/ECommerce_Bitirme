@@ -9,6 +9,7 @@ namespace ECommerce.Business.Mappings
         public InvoiceInfoProfile()
         {
             CreateMap<InvoiceInfoCheckoutDto, InvoiceInfo>();
+            CreateMap<InvoiceInfo, InvoiceInfoListDto>();
         }
     }
 }

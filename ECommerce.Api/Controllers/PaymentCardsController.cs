@@ -1,8 +1,6 @@
-﻿using ECommerce.Business.ActionFilters;
-using ECommerce.Business.Models.Dtos.PaymentCards;
+﻿using ECommerce.Business.Models.Dtos.PaymentCards;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Business.Services.Contracts.IWriteServices;
-using ECommerce.Business.Validations.FluentValidations.PaymentCards;
 using ECommerce.Core.Consts;
 using ECommerce.Core.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -50,7 +48,6 @@ namespace ECommerce.Api.Controllers
         /// <returns>Eklenen kart</returns>
         [HttpPost(Name = "AddPaymentCard")]
         [Authorize(Roles = $"{RoleConsts.User}")]
-        [TypeFilter(typeof(FluentValidationFilterAttribute<PaymentCardAddDtoValidator, PaymentCardAddDto>), Arguments = ["paymentCard"])]
         public async Task<IActionResult> AddPaymentCard([FromBody] PaymentCardAddDto paymentCard)
         {
             var response = await _paymentCardWriteService.AddPaymentCardAsync(paymentCard);
@@ -63,7 +60,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="paymentCard">Güncellenecek kart detayları</param>
         /// <returns>Güncellenen kart</returns>
         [HttpPut(Name = "UpdatePaymentCard")]
-        [TypeFilter(typeof(FluentValidationFilterAttribute<PaymentCardUpdateDtoValidator, PaymentCardUpdateDto>), Arguments = ["paymentCard"])]
         [Authorize(Roles = $"{RoleConsts.User}")]
         public async Task<IActionResult> UpdatePaymentCard([FromBody] PaymentCardUpdateDto paymentCard)
         {

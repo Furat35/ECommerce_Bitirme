@@ -1,9 +1,7 @@
-﻿using ECommerce.Business.ActionFilters;
-using ECommerce.Business.Helpers.Brands;
+﻿using ECommerce.Business.Helpers.Brands;
 using ECommerce.Business.Models.Dtos.Brands;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Business.Services.Contracts.IWriteServices;
-using ECommerce.Business.Validations.FluentValidations.Brands;
 using ECommerce.Core.Consts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +43,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="id">Marka id'si</param>
         /// <returns>Verilen id'deki marka</returns>
         [HttpGet("{id}", Name = "GetBrandById")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         public async Task<IActionResult> GetBrandById(string id)
         {
             var brand = await _brandReadService.GetBrandByIdAsync(id);
@@ -59,7 +56,6 @@ namespace ECommerce.Api.Controllers
         /// <returns>Eklenen marka</returns>
         [HttpPost(Name = "AddBrand")]
         [Authorize(Roles = $"{RoleConsts.Admin}")]
-        [TypeFilter(typeof(FluentValidationFilterAttribute<BrandAddDtoValidator, BrandAddDto>), Arguments = ["brand"])]
         public async Task<IActionResult> AddBrand([FromBody] BrandAddDto brand)
         {
             var response = await _brandWriteService.AddBrandAsync(brand);
@@ -72,7 +68,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="brand">Güncellenecek marka detayları</param>
         /// <returns>Güncellenen marka</returns>
         [HttpPut(Name = "UpdateBrand")]
-        [TypeFilter(typeof(FluentValidationFilterAttribute<BrandUpdateDtoValidator, BrandUpdateDto>), Arguments = ["brand"])]
         [Authorize(Roles = $"{RoleConsts.Admin}")]
         public async Task<IActionResult> UpdateBrand([FromBody] BrandUpdateDto brand)
         {
@@ -86,7 +81,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="id">Silinecek marka id'si</param>
         /// <returns>Ok</returns>
         [HttpDelete("{id}", Name = "DeleteBrand")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         [Authorize(Roles = $"{RoleConsts.Admin}")]
         public async Task<IActionResult> DeleteBrand(string id)
         {

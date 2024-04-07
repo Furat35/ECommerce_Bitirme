@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Business.Extensions;
 using ECommerce.Business.Models.Dtos.Addresses;
 using ECommerce.Business.Models.Dtos.Users;
 using ECommerce.Business.Services.Contracts.IReadServices;
@@ -10,6 +11,7 @@ using ECommerce.Core.Helpers.PasswordServices;
 using ECommerce.DataAccess.UnitOfWorks;
 using ECommerce.Entity.Entities;
 using ECommerce.Entity.Enums;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
@@ -23,9 +25,12 @@ namespace ECommerce.Business.Services.WriteServices
         private readonly IUserReadService _userReadService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPasswordGenerationService _passwordGenerationService;
+        private readonly IValidator<UserAddDto> _userAddDtoValidator;
+        private readonly IValidator<AddressUpdateDto> _addressUpdateDtoValidator;
 
         public UserWriteService(IMapper mapper, IUnitOfWork unitOfWork, IUserReadService userReadService,
-            IHttpContextAccessor httpContextAccessor, IPasswordGenerationService passwordGenerationService)
+            IHttpContextAccessor httpContextAccessor, IPasswordGenerationService passwordGenerationService,
+            IValidator<UserAddDto> userAddDtoValidator, IValidator<AddressUpdateDto> addressUpdateDtoValidator)
         {
             _userWriteRepository = unitOfWork.GetWriteRepository<User>();
             Users = _userWriteRepository;
@@ -33,14 +38,18 @@ namespace ECommerce.Business.Services.WriteServices
             _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
             _passwordGenerationService = passwordGenerationService;
+            _userAddDtoValidator = userAddDtoValidator;
+            _addressUpdateDtoValidator = addressUpdateDtoValidator;
         }
 
         public IWriteRepository<User> Users { get; set; }
 
         public async Task<bool> AddUserAsync(UserAddDto user)
         {
+            await CustomFluentValidationErrorHandling.ValidateAndThrowAsync(user, _userAddDtoValidator);
             await ThrowErrorIfSameMailExists(user.Mail);
             var mappedUser = _mapper.Map<User>(user);
+            mappedUser.IsValid = true;
             CreateCartIfRoleIsUser(mappedUser);
 
             return await _userWriteRepository.AddAsync(mappedUser);
@@ -73,6 +82,7 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> UpdateAddress(AddressUpdateDto addressUpdateDto)
         {
+            await CustomFluentValidationErrorHandling.ValidateAndThrowAsync(addressUpdateDto, _addressUpdateDtoValidator);
             var user = await _userReadService.Users.GetWhere(_ => _.Id == Guid.Parse(_httpContextAccessor.HttpContext.User.GetActiveUserId()), includeProperties: [_ => _.Address]).FirstOrDefaultAsync();
             if (user.Address is null)
                 user.Address = _mapper.Map<Address>(addressUpdateDto);
@@ -84,6 +94,7 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> ActivateUserAsync(string userId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(userId);
             var user = await _userReadService.Users.GetByIdAsync(userId);
             if (user is null)
                 throw new NotFoundException("Kullanıcı bulunamadı!");
@@ -98,6 +109,7 @@ namespace ECommerce.Business.Services.WriteServices
 
         private async Task<User> GetSingleUser(string userId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(userId);
             var user = await _userReadService.Users.GetByIdAsync(userId);
             if (user is null || !user.IsValid)
                 throw new NotFoundException("Kullanıcı bulunamadı!");

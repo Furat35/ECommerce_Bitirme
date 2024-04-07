@@ -30,10 +30,7 @@ namespace ECommerce.Business.Helpers.FilterServices
                 _products = GetBySubCategory(filters.SubCategory.Value);
 
             int pageNumber;
-            if (_products.Count() > filters.PageSize)
-                pageNumber = _products.Count() % filters.PageSize == 0 ? _products.Count() / filters.PageSize : _products.Count() / filters.PageSize + 1;
-            else
-                pageNumber = 1;
+            pageNumber = _products.Count() % filters.PageSize == 0 ? _products.Count() / filters.PageSize : _products.Count() / filters.PageSize + 1;
             Metadata metadata = new(filters.Page, filters.PageSize, _products.Count(), pageNumber);
             _products = AddPagination(filters);
             var header = new CustomHeaders().AddPaginationHeader(metadata);
@@ -85,7 +82,7 @@ namespace ECommerce.Business.Helpers.FilterServices
 
 
             return _products
-                .Skip(filters.Page * filters.PageSize)
+                .Skip((filters.Page - 1) * filters.PageSize)
                 .Take(filters.PageSize); ;
         }
 

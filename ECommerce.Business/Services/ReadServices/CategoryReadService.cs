@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Business.Extensions;
 using ECommerce.Business.Helpers.Categories;
 using ECommerce.Business.Helpers.FilterServices;
 using ECommerce.Business.Helpers.HeaderServices;
@@ -35,7 +36,14 @@ namespace ECommerce.Business.Services.ReadServices
 
         public List<CategoryListDto> GetCategoriesWhere(CategoryRequestFilter filters, Expression<Func<Category, bool>> predicate)
         {
-            var categories = Categories.GetWhere(predicate, includeProperties: [_ => _.SubCategories]);
+            var categories = Categories.GetWhere(predicate, includeProperties: [_ => _.SubCategories]).Select(_ => new Category
+            {
+                Id = _.Id,
+                Name = _.Name,
+                SubCategories = _.SubCategories.Where(_ => _.IsValid).ToList()
+            });
+
+            categories.Where(_ => _.SubCategories.Where(_ => _.IsValid) != null);
             var filteredCategorys = new CategoryFilterService(_mapper, categories).FilterCategories(filters);
             new HeaderService(_httpContext).AddToHeaders(filteredCategorys.Headers);
 
@@ -44,6 +52,7 @@ namespace ECommerce.Business.Services.ReadServices
 
         private async Task<Category> GetSingleCategory(string categoryId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(categoryId);
             var category = await Categories.GetByIdAsync(categoryId, includeProperties: [_ => _.SubCategories]);
             if (category is null || !category.IsValid)
                 throw new NotFoundException("Kategori bulunamadı!");

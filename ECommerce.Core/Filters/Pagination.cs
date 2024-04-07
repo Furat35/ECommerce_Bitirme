@@ -2,7 +2,7 @@
 {
     public class Pagination
     {
-        int _page = 0;
+        int _page = 1;
         int _pageSize = 10;
 
         public int Page
@@ -13,7 +13,7 @@
             }
             set
             {
-                _page = value < 0 ? 0 : value;
+                _page = value < 0 ? 1 : value;
             }
         }
 

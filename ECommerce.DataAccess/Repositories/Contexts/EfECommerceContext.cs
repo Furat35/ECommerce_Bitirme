@@ -36,7 +36,7 @@ namespace ECommerce.DataAccess.Repositories.Contexts
                 {
                     case EntityState.Added:
                         baseEntity.CreatedDate = DateTime.UtcNow;
-                        baseEntity.IsValid = true;
+                        //baseEntity.IsValid = true;
                         break;
 
                     case EntityState.Modified:

@@ -27,7 +27,7 @@
             }
             set
             {
-                _currentPage = value > 0 ? value : 0;
+                _currentPage = value > 0 ? value : 1;
             }
         }
 
@@ -39,7 +39,7 @@
             }
             set
             {
-                _pageSize = value > 0 ? (value > 30 ? 30 : value) : 5;
+                _pageSize = value > 0 ? (value > 30 ? 30 : value) : 10;
             }
         }
 
@@ -51,7 +51,7 @@
             }
             set
             {
-                _totalPages = value > 0 ? value : 0;
+                _totalPages = value;
             }
         }
 
@@ -67,7 +67,7 @@
             }
         }
 
-        public bool HasNext => TotalPages > CurrentPage;
+        public bool HasNext => TotalPages > CurrentPage + 1;
         public bool HasPrevious => CurrentPage > 1;
         public bool IsValidPage => CurrentPage <= TotalPages;
     }

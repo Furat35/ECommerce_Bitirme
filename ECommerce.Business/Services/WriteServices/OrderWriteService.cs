@@ -23,9 +23,9 @@ namespace ECommerce.Business.Services.WriteServices
         private readonly IProductWriteService _productWriteService;
         private readonly IAddressReadService _addressReadService;
         private readonly IOrderReadService _orderReadService;
-
-        public OrderWriteService(IUnitOfWork unitOfWork, IMapper mapper, ICartReadService cartReadService, IHttpContextAccessor httpContextAccessor,
-            ICartWriteService cartWriteService, IProductWriteService productWriteService, IAddressReadService addressReadService, IOrderReadService orderReadService)
+        private readonly IPaymentCardReadService _paymentCardReadService;
+        public OrderWriteService(IUnitOfWork unitOfWork, IMapper mapper, ICartReadService cartReadService, IHttpContextAccessor httpContextAccessor, ICartWriteService cartWriteService,
+            IProductWriteService productWriteService, IAddressReadService addressReadService, IOrderReadService orderReadService, IPaymentCardReadService paymentCardReadService)
         {
             _orderWriteRepository = unitOfWork.GetWriteRepository<Order>();
             _unitOfWork = unitOfWork;
@@ -36,6 +36,7 @@ namespace ECommerce.Business.Services.WriteServices
             _productWriteService = productWriteService;
             _addressReadService = addressReadService;
             _orderReadService = orderReadService;
+            _paymentCardReadService = paymentCardReadService;
         }
 
         public async Task CheckoutOrder(OrderCheckoutDto orderCheckoutDto)
@@ -45,6 +46,7 @@ namespace ECommerce.Business.Services.WriteServices
                 try
                 {
                     var orderCheckout = await CreateOrder(orderCheckoutDto);
+                    orderCheckout.IsValid = true;
                     bool orderIsCreated = await _orderWriteRepository.AddAsync(orderCheckout);
                     if (orderIsCreated)
                         await _cartWriteService.ClearCart(_httpContextAccessor.HttpContext.User.GetActiveUserId());
@@ -76,17 +78,20 @@ namespace ECommerce.Business.Services.WriteServices
         {
             var userId = _httpContextAccessor.HttpContext.User.GetActiveUserId();
             var cart = await _cartReadService.GetCartAsync(userId);
+            if (cart.CartItems is null || cart.CartItems.Count == 0)
+                throw new BadRequestException("Sepette ürün bulunmuyor!");
 
             await UpdateProductStocks(cart.CartItems);
-            var orderCheckout = _mapper.Map<Order>(orderCheckoutDto);
-            orderCheckout.TotalPrice = cart.TotalPrice;
-            orderCheckout.OrderStatuses = new List<OrderStatus>() { new OrderStatus { Status = Entity.Enums.OrderStatus.Pending, IsValid = true } };
-            await SetOrderShippingPlace(orderCheckout, orderCheckoutDto.UseActiveUserAddress);
-            SetOrderInvoiceInfo(orderCheckout, cart.TotalPrice);
-            SetOrderItemStatusesToPending(orderCheckout, cart.CartItems);
-            orderCheckout.UserId = Guid.Parse(userId);
+            var order = _mapper.Map<Order>(orderCheckoutDto);
+            order.TotalPrice = cart.TotalPrice;
+            order.OrderStatuses = new List<OrderStatus>() { new() { Status = Entity.Enums.OrderStatus.Pending, IsValid = true } };
+            await SetOrderShippingPlace(order, orderCheckoutDto.UseSavedUserAddress);
+            await SetOrderPaymentDetail(order, orderCheckoutDto.UseSavedPaymentCard);
+            SetOrderInvoiceInfo(order, cart.TotalPrice);
+            SetOrderItemStatusesToPending(order, cart.CartItems);
+            order.UserId = Guid.Parse(userId);
 
-            return orderCheckout;
+            return order;
         }
 
         private async Task UpdateProductStocks(ICollection<CartItemListDto> cartItems)
@@ -95,16 +100,29 @@ namespace ECommerce.Business.Services.WriteServices
                 await _productWriteService.DecreaseProductQuantity(cartItem.Product.Id.ToString(), cartItem.Quantity);
         }
 
-        private async Task SetOrderShippingPlace(Order orderCheckout, bool useActiveUserAddress)
+        private async Task SetOrderShippingPlace(Order order, bool useActiveUserAddress)
         {
             var userId = _httpContextAccessor.HttpContext.User.GetActiveUserId();
-            if (!useActiveUserAddress)
-                orderCheckout.ShippingPlace = _mapper.Map<ShippingPlace>(orderCheckout.ShippingPlace);
-            else
+            if (useActiveUserAddress)
             {
                 var userAddress = await _addressReadService.GetUserAddress(userId);
-                if (userAddress != null)
-                    orderCheckout.ShippingPlace = _mapper.Map<ShippingPlace>(userAddress);
+                if (userAddress is null)
+                    throw new BadRequestException("Adres bilginizi güncelleyiniz!");
+
+                order.ShippingPlace = _mapper.Map<ShippingPlace>(userAddress);
+            }
+        }
+
+        private async Task SetOrderPaymentDetail(Order order, bool useActiveUserPaymentDetails)
+        {
+            var userId = _httpContextAccessor.HttpContext.User.GetActiveUserId();
+            if (useActiveUserPaymentDetails)
+            {
+                var userPaymentDetail = await _paymentCardReadService.GetPaymentCardByUserIdAsync(userId);
+                if (userPaymentDetail is null)
+                    throw new BadRequestException("Ödeme bilginizi güncelleyiniz!");
+
+                order.OrderPaymentDetail = _mapper.Map<OrderPaymentDetail>(userPaymentDetail);
             }
         }
 

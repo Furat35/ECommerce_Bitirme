@@ -1,4 +1,5 @@
-﻿using ECommerce.Business.Services.Contracts.IWriteServices;
+﻿using ECommerce.Business.Extensions;
+using ECommerce.Business.Services.Contracts.IWriteServices;
 using ECommerce.Business.Services.ImageService;
 using ECommerce.Core.DataAccess.Repositories.Abstract;
 using ECommerce.Core.Exceptions;
@@ -23,6 +24,7 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> RemoveProductPhoto(Product product, string imageId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(imageId);
             var image = product.ProductPhotos.FirstOrDefault(_ => _.Id == Guid.Parse(imageId));
             _fileService.RemoveFile(image.PhotoPath);
 

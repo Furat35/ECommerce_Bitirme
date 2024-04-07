@@ -1,9 +1,7 @@
-﻿using ECommerce.Business.ActionFilters;
-using ECommerce.Business.Helpers.Categories;
+﻿using ECommerce.Business.Helpers.Categories;
 using ECommerce.Business.Models.Dtos.Categories;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Business.Services.Contracts.IWriteServices;
-using ECommerce.Business.Validations.FluentValidations.Categories;
 using ECommerce.Core.Consts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +43,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="id">Kategori id'si</param>
         /// <returns>Verilen id'deki kategori</returns>
         [HttpGet("{id}", Name = "GetCategoryById")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         public async Task<IActionResult> GetCategoryById(string id)
         {
             var category = await _categoryReadService.GetCategoryByIdAsync(id);
@@ -59,7 +56,6 @@ namespace ECommerce.Api.Controllers
         /// <returns>Eklenen kategori</returns>
         [HttpPost(Name = "AddCategory")]
         [Authorize(Roles = $"{RoleConsts.Admin}")]
-        [TypeFilter(typeof(FluentValidationFilterAttribute<CategoryAddDtoValidator, CategoryAddDto>), Arguments = ["category"])]
         public async Task<IActionResult> AddCategory([FromBody] CategoryAddDto category)
         {
             var response = await _categoryWriteService.AddCategoryAsync(category);
@@ -73,7 +69,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="category">Güncellenecek kategori detayları</param>
         /// <returns>Güncellenen kategori</returns>
         [HttpPut(Name = "UpdateCategory")]
-        [TypeFilter(typeof(FluentValidationFilterAttribute<CategoryUpdateDtoValidator, CategoryUpdateDto>), Arguments = ["category"])]
         [Authorize(Roles = $"{RoleConsts.Admin}")]
         public async Task<IActionResult> UpdateCategory([FromBody] CategoryUpdateDto category)
         {
@@ -87,7 +82,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="id">Silinecek kategori id'si</param>
         /// <returns>Ok</returns>
         [HttpDelete("{id}", Name = "DeleteCategory")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         [Authorize(Roles = $"{RoleConsts.Admin}")]
         public async Task<IActionResult> DeleteCategory(string id)
         {

@@ -1,9 +1,7 @@
-﻿using ECommerce.Business.ActionFilters;
-using ECommerce.Business.Helpers.Users;
+﻿using ECommerce.Business.Helpers.Users;
 using ECommerce.Business.Models.Dtos.Addresses;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Business.Services.Contracts.IWriteServices;
-using ECommerce.Business.Validations.FluentValidations.Addresses;
 using ECommerce.Core.Consts;
 using ECommerce.Core.Exceptions;
 using ECommerce.Core.Extensions;
@@ -49,7 +47,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="id">Getirilecek kullanıcının id'si</param>
         /// <returns>kullanıcı bilgileri</returns>
         [HttpGet("{id}", Name = "GetByUserId")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company},{RoleConsts.User}")]
         public async Task<IActionResult> GetUserById(string id)
         {
@@ -68,7 +65,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="id">Silinecek olan kullanının id'si</param>
         /// <returns>Ok</returns>
         [HttpDelete("{id}", Name = "DeleteUser")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company},{RoleConsts.User}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
@@ -89,7 +85,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="password">Yeni şifre</param>
         /// <returns>İşlem başarılı olup olmadığı</returns>
         [HttpPut("password", Name = "UpdatePassword")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["password"])]
         [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company},{RoleConsts.User}")]
         public async Task<IActionResult> UpdatePassword([FromBody] string password)
         {
@@ -103,7 +98,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="address">Yeni adres</param>
         /// <returns>İşlemin başarılı olup olmadığı</returns>
         [HttpPut("address")]
-        [TypeFilter(typeof(FluentValidationFilterAttribute<AddressUpdateDtoValidator, AddressUpdateDto>), Arguments = ["address"])]
         [Authorize(Roles = $"{RoleConsts.Company},{RoleConsts.User}")]
         public async Task<IActionResult> UpdateAddress([FromBody] AddressUpdateDto address)
         {
@@ -117,7 +111,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="id">Kullanıcı id'si</param>
         /// <returns>İşlemin başarılı olup olmadığı</returns>
         [HttpPut("{id}", Name = "ActivateUser")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company},{RoleConsts.User}")]
         public async Task<IActionResult> ActivateUser(string id)
         {

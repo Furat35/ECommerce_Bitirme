@@ -14,7 +14,9 @@ namespace ECommerce.Api.Extensions
             services.AddControllers(opt =>
             {
                 opt.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+
             });
+            //.AddJsonOptions(opt => opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();

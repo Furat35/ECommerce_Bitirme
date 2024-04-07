@@ -4,6 +4,7 @@ using ECommerce.Business.Helpers.HeaderServices;
 using ECommerce.Business.Helpers.Users;
 using ECommerce.Business.Models.Dtos.Users;
 using ECommerce.Core.DataAccess.Repositories.Abstract;
+using ECommerce.Core.Exceptions;
 using ECommerce.DataAccess.UnitOfWorks;
 using ECommerce.Entity.Entities;
 using Microsoft.AspNetCore.Http;
@@ -28,7 +29,9 @@ namespace ECommerce.Business.Services.Contracts.IReadServices
         public async Task<UserListDto> GetUserByIdAsync(string userId)
         {
             var user = await Users.GetByIdAsync(userId);
-            return _mapper.Map<UserListDto>(user);
+            return user != null
+                ? _mapper.Map<UserListDto>(user)
+                : throw new NotFoundException("Kullanıcı bulunamadı!");
         }
 
         public List<UserListDto> GetUsersWhere(UserRequestFilter filters, Expression<Func<User, bool>> predicate = null)

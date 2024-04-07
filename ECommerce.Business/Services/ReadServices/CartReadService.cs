@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Business.Extensions;
 using ECommerce.Business.Models.Dtos.Carts;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Core.DataAccess.Repositories.Abstract;
@@ -27,7 +28,8 @@ namespace ECommerce.Business.Services.ReadServices
 
         public async Task<CartListDto> GetCartAsync(string userId)
         {
-            var cart = await Carts.GetSingleAsync(_ => _.UserId.ToString() == userId, includeProperties: [_ => _.CartItems]);
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(userId);
+            var cart = await Carts.GetSingleAsync(_ => _.Id.ToString() == userId, includeProperties: [_ => _.CartItems]);
             if (cart is null)
                 throw new NotFoundException("Sepet bulunamadı!");
 

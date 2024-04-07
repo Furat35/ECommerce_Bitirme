@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Business.Extensions;
 using ECommerce.Business.Helpers.FilterServices;
 using ECommerce.Business.Helpers.HeaderServices;
 using ECommerce.Business.Helpers.Products;
@@ -33,6 +34,7 @@ namespace ECommerce.Business.Services.ReadServices
 
         public async Task<ProductListDto> GetProductIdAsync(string productId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(productId);
             var product = await Products.GetByIdAsync(productId, includeProperties: [_ => _.SubCategory, _ => _.SubCategory.Category, _ => _.Brand, _ => _.ProductPhotos]);
             ThrowNotFoundIfProductNotExists(product);
             var mappedProduct = _mapper.Map<ProductListDto>(product);
@@ -52,8 +54,10 @@ namespace ECommerce.Business.Services.ReadServices
 
         public List<ProductListDto> GetProductsWhere(ProductRequestFilter filters, Expression<Func<Product, bool>> predicate)
         {
-            var products = Products.GetWhere(predicate, includeProperties: [_ => _.SubCategory, _ => _.SubCategory.Category, _ => _.Brand]);
+            var products = Products.GetWhere(predicate, includeProperties: [_ => _.SubCategory, _ => _.SubCategory.Category, _ => _.Brand, _ => _.ProductPhotos]);
             var filteredProducts = new ProductFilterService(_mapper, products).FilterProducts(filters);
+            foreach (var product in filteredProducts.ResponseValue)
+                product.Images = GetProductPhotos(products.Where(_ => _.Id == product.Id).First().ProductPhotos);
             new HeaderService(_httpContext).AddToHeaders(filteredProducts.Headers);
 
             return filteredProducts.ResponseValue;
@@ -61,12 +65,13 @@ namespace ECommerce.Business.Services.ReadServices
 
         public async Task<bool> IsCompaniesProduct(string productId, string companyId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(productId, companyId);
             var product = await Products.GetSingleAsync(_ => _.Id == Guid.Parse(productId) && _.CreatedBy == Guid.Parse(companyId), false);
             return product != null;
         }
 
         private bool ThrowNotFoundIfProductNotExists(Product product)
-            => product is null
+            => product is null || !product.IsValid
                 ? throw new NotFoundException("Ürün bulunamadı!")
                 : true;
 

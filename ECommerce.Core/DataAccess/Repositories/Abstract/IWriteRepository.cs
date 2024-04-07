@@ -11,6 +11,7 @@ namespace ECommerce.Core.DataAccess.Repositories.Abstract
         Task<bool> RemoveAsync(TEntity model);
         Task<bool> RemoveRangeAsync(List<TEntity> models);
         Task<bool> UpdateAsync(TEntity model);
+        Task<bool> UpdateRangeAsync(List<TEntity> models);
         Task<bool> SaveChangesAsync();
     }
 

@@ -5,7 +5,8 @@ namespace ECommerce.Business.Models.Dtos.Orders
 {
     public class OrderCheckoutDto
     {
-        public bool UseActiveUserAddress { get; set; }
+        public bool UseSavedUserAddress { get; set; } = true;
+        public bool UseSavedPaymentCard { get; set; } = true;
         public ShippingPlaceCheckoutDto ShippingPlace { get; set; }
         public OrderPaymentDetailCheckoutDto OrderPaymentDetail { get; set; }
     }

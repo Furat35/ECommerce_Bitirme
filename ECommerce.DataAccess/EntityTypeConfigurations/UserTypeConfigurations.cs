@@ -38,22 +38,22 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
 
             builder.HasOne(u => u.Cart)
                 .WithOne(u => u.User)
-                .HasForeignKey<Cart>(o => o.UserId)
+                .HasForeignKey<Cart>(o => o.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(u => u.Company)
                 .WithOne(u => u.User)
-                .HasForeignKey<Company>(o => o.UserId)
+                .HasForeignKey<Company>(o => o.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(u => u.Address)
                 .WithOne(u => u.User)
-                .HasForeignKey<Address>(o => o.UserId)
+                .HasForeignKey<Address>(o => o.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(u => u.PaymentCard)
                 .WithOne(u => u.User)
-                .HasForeignKey<PaymentCard>(o => o.UserId)
+                .HasForeignKey<PaymentCard>(o => o.Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

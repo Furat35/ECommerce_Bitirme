@@ -34,6 +34,11 @@ namespace ECommerce.Business.Extensions
             services.AddScoped<ICartWriteService, CartWriteService>();
             services.AddScoped<IUserWriteService, UserWriteService>();
             services.AddScoped<IOrderWriteService, OrderWriteService>();
+            services.AddScoped<IOrderReadService, OrderReadService>();
+            services.AddScoped<IOrderItemReadService, OrderItemReadService>();
+            services.AddScoped<IOrderItemWriteService, OrderItemWriteService>();
+            services.AddScoped<ICompanyReadService, CompanyReadService>();
+            services.AddScoped<ICompanyWriteService, CompanyWriteService>();
             services.AddScoped<IAddressReadService, AddressReadService>();
             services.AddScoped<IProductPhotoWriteService, ProductPhotoWriteService>();
             services.AddScoped<IAuthWriteService, AuthWriteService>();

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Business.Extensions;
 using ECommerce.Business.Models.Dtos.PaymentCards;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Core.DataAccess.Repositories.Abstract;
@@ -21,14 +22,16 @@ namespace ECommerce.Business.Services.ReadServices
 
         public async Task<PaymentCardListDto> GetPaymentCardByUserIdAsync(string userId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(userId);
             var paymentCard = await GetSinglePaymentCard(userId);
             return _mapper.Map<PaymentCardListDto>(paymentCard);
         }
 
         private async Task<PaymentCard> GetSinglePaymentCard(string userId)
         {
-            var paymentCard = await PaymentCards.GetSingleAsync(_ => _.UserId.ToString() == userId);
-            if (paymentCard is null || !paymentCard.IsValid)
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(userId);
+            var paymentCard = await PaymentCards.GetSingleAsync(_ => _.Id.ToString() == userId);
+            if (paymentCard is null)
                 throw new NotFoundException("Kart bilgisi bulunamadı!");
 
             return paymentCard;

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Business.Extensions;
 using ECommerce.Business.Helpers.Brands;
 using ECommerce.Business.Helpers.FilterServices;
 using ECommerce.Business.Helpers.HeaderServices;
@@ -44,6 +45,7 @@ namespace ECommerce.Business.Services.ReadServices
 
         private async Task<Brand> GetSingleBrand(string brandId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(brandId);
             var brand = await Brands.GetByIdAsync(brandId);
             if (brand is null || !brand.IsValid)
                 throw new NotFoundException("Marka bulunamadı!");

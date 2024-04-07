@@ -12,13 +12,9 @@ namespace ECommerce.Entity.Entities
         public string Password { get; set; }
         public string PasswordSalt { get; set; }
         public Role Role { get; set; }
-        public Guid? CartId { get; set; }
         public Cart Cart { get; set; }
-        public Guid? CompanyId { get; set; }
         public Company Company { get; set; }
-        public Guid? AddressId { get; set; }
         public Address Address { get; set; }
-        public Guid? PaymentCardId { get; set; }
         public PaymentCard PaymentCard { get; set; }
         public virtual ICollection<Order>? Orders { get; set; }
     }

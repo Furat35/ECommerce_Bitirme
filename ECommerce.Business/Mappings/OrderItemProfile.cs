@@ -9,6 +9,7 @@ namespace ECommerce.Business.Mappings
         public OrderItemProfile()
         {
             CreateMap<OrderItemCheckoutDto, OrderItem>();
+            CreateMap<OrderItem, OrderItemListDto>();
         }
     }
 }

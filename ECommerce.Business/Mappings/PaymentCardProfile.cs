@@ -12,6 +12,7 @@ namespace ECommerce.Business.Mappings
             CreateMap<PaymentCardAddDto, PaymentCard>().ReverseMap();
             CreateMap<PaymentCard, PaymentCardUpdateDto>().ReverseMap();
             CreateMap<PaymentCardAddDto, PaymentCardUpdateDto>();
+            CreateMap<PaymentCardListDto, OrderPaymentDetail>();
         }
     }
 }

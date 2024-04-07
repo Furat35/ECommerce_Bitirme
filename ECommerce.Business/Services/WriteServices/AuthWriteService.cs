@@ -1,4 +1,5 @@
-﻿using ECommerce.Business.Helpers.TokenServices;
+﻿using ECommerce.Business.Extensions;
+using ECommerce.Business.Helpers.TokenServices;
 using ECommerce.Business.Models.Dtos.Auth;
 using ECommerce.Business.Models.Dtos.Companies;
 using ECommerce.Business.Models.Dtos.Users;
@@ -8,6 +9,7 @@ using ECommerce.Core.Exceptions;
 using ECommerce.Core.Helpers.PasswordServices;
 using ECommerce.Entity.Entities;
 using ECommerce.Entity.Enums;
+using FluentValidation;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,18 +22,25 @@ namespace ECommerce.Business.Services.WriteServices
         private readonly IUserWriteService _userWriteService;
         private readonly ITokenService _tokenService;
         private readonly IPasswordGenerationService _passwordGenerationService;
+        private readonly IValidator<LoginDto> _loginDtoValidator;
+        private readonly IValidator<RegisterDto> _registerDtoValidator;
 
         public AuthWriteService(IUserReadService userReadService, IUserWriteService userWriteService,
-            ITokenService tokenService, IPasswordGenerationService passwordGenerationService)
+            ITokenService tokenService, IPasswordGenerationService passwordGenerationService,
+            IValidator<LoginDto> loginDtoValidator, IValidator<RegisterDto> registerDtoValidator)
         {
             _userReadService = userReadService;
             _userWriteService = userWriteService;
             _tokenService = tokenService;
             _passwordGenerationService = passwordGenerationService;
+            _loginDtoValidator = loginDtoValidator;
+            _registerDtoValidator = registerDtoValidator;
         }
 
         public async Task<string> UserLoginAsync(LoginDto loginUser)
         {
+            await CustomFluentValidationErrorHandling.ValidateAndThrowAsync(loginUser, _loginDtoValidator);
+
             var user = await _userReadService.Users.GetSingleAsync(_ => _.Mail == loginUser.Mail);
             if (user != null && _passwordGenerationService.VerifyPassword(user.PasswordSalt, user.Password, loginUser.Password))
             {
@@ -47,6 +56,8 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> UserRegisterAsync(RegisterDto registerUser, Role role)
         {
+            await CustomFluentValidationErrorHandling.ValidateAndThrowAsync(registerUser, _registerDtoValidator);
+
             if (await _userReadService.CheckIfUserExists(registerUser.Mail))
                 throw new BadRequestException("Mail adresi kayıtlı! Başka mail adresi kullanın.");
 
@@ -65,7 +76,7 @@ namespace ECommerce.Business.Services.WriteServices
                 PasswordSalt = storedSalt,
                 Phone = registerUser.Phone,
                 Role = role,
-                Company = IsCompany(registerUser, role)
+                Company = IsCompany(registerUser, role),
             };
             bool result = await _userWriteService.AddUserAsync(user);
 

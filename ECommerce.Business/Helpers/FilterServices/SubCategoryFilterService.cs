@@ -22,10 +22,7 @@ namespace ECommerce.Business.Helpers.FilterServices
         public ProductResponse<List<SubCategoryListDto>> FilterCategories(SubCategoryRequestFilter filters)
         {
             int pageNumber;
-            if (_subCategories.Count() > filters.PageSize)
-                pageNumber = _subCategories.Count() % filters.PageSize == 0 ? _subCategories.Count() / filters.PageSize : _subCategories.Count() / filters.PageSize + 1;
-            else
-                pageNumber = 1;
+            pageNumber = _subCategories.Count() % filters.PageSize == 0 ? _subCategories.Count() / filters.PageSize : _subCategories.Count() / filters.PageSize + 1;
             Metadata metadata = new(filters.Page, filters.PageSize, _subCategories.Count(), pageNumber);
             _subCategories = AddPagination(filters);
             var header = new CustomHeaders().AddPaginationHeader(metadata);
@@ -41,7 +38,7 @@ namespace ECommerce.Business.Helpers.FilterServices
         private IQueryable<SubCategory> AddPagination(SubCategoryRequestFilter filters)
           => _subCategories
               .OrderBy(_ => _.Name)
-              .Skip(filters.Page * filters.PageSize)
+              .Skip((filters.Page - 1) * filters.PageSize)
               .Take(filters.PageSize);
     }
 }

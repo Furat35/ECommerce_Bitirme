@@ -8,7 +8,6 @@ namespace ECommerce.Entity.Entities
         public string CardNumber { get; set; }
         public string CVV { get; set; }
         public DateTime ExpireDate { get; set; }
-        public Guid UserId { get; set; }
         public User User { get; set; }
     }
 }

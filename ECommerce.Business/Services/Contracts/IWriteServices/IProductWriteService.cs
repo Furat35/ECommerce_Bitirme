@@ -11,5 +11,7 @@ namespace ECommerce.Business.Services.Contracts.IWriteServices
         Task<bool> UpdateProductAsync(ProductUpdateDto product);
         Task<bool> UploadProductPhoto(string productId);
         Task<bool> DecreaseProductQuantity(string productId, int quantity);
+        Task<bool> ConfirmProductToAdded(string productId);
+        Task<bool> ConfirmAllProductsToAdded();
     }
 }

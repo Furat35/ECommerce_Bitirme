@@ -10,6 +10,7 @@ namespace ECommerce.Business.Mappings
         {
             CreateMap<CompanyAddDto, Company>();
             CreateMap<Company, CompanyListDto>();
+            CreateMap<CompanyUpdateDto, Company>().ForMember(_ => _.Id, opt => opt.Ignore());
         }
     }
 }

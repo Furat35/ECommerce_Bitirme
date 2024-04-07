@@ -10,7 +10,6 @@ namespace ECommerce.Entity.Entities
         }
 
         public virtual ICollection<CartItem> CartItems { get; set; }
-        public Guid UserId { get; set; }
         public User User { get; set; }
     }
 }

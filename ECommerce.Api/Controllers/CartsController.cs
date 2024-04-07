@@ -1,8 +1,6 @@
-﻿using ECommerce.Business.ActionFilters;
-using ECommerce.Business.Models.Dtos.CartItems;
+﻿using ECommerce.Business.Models.Dtos.CartItems;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Business.Services.Contracts.IWriteServices;
-using ECommerce.Business.Validations.FluentValidations.CartItems;
 using ECommerce.Core.Consts;
 using ECommerce.Core.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -47,7 +45,6 @@ namespace ECommerce.Api.Controllers
         /// <returns>Eklenen ürün</returns>
         [HttpPut(Name = "UpdateCart")]
         [Authorize(Roles = $"{RoleConsts.User}")]
-        [TypeFilter(typeof(FluentValidationFilterAttribute<CartItemAddDtoValidator, CartItemAddDto>), Arguments = ["cartItem"])]
         public async Task<IActionResult> UpdateCart([FromBody] CartItemAddDto cartItem)
         {
             bool isAdded = await _cartWriteService.AddItemToCart(cartItem, HttpContext.User.GetActiveUserId());

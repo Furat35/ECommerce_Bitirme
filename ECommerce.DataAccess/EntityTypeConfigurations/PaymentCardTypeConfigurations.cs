@@ -25,8 +25,9 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
                .IsFixedLength();
             builder.Property(_ => _.ExpireDate)
               .IsRequired();
-            builder.Property(_ => _.UserId)
-            .IsRequired();
+
+            builder.Ignore(_ => _.DeletedDate);
+            builder.Ignore(_ => _.IsValid);
         }
     }
 }

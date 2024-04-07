@@ -10,7 +10,6 @@ namespace ECommerce.Entity.Entities
         public string Address2 { get; set; }
         public Guid DistrictId { get; set; }
         public District District { get; set; }
-        public Guid UserId { get; set; }
         public User User { get; set; }
     }
 }

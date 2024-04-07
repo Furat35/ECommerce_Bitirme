@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Business.Extensions;
 using ECommerce.Business.Models.Dtos.Addresses;
 using ECommerce.Business.Models.Dtos.Cities;
 using ECommerce.Business.Models.Dtos.Countries;
@@ -30,13 +31,17 @@ namespace ECommerce.Business.Services.ReadServices
 
         public async Task<AddressListDto> GetUserAddress(string userId)
         {
-            var address = await Addresses.GetSingleAsync(_ => _.UserId == Guid.Parse(userId));
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(userId);
+            var address = await Addresses.GetSingleAsync(_ => _.Id == Guid.Parse(userId));
+
             return address != null ? _mapper.Map<AddressListDto>(address) : null;
         }
 
         public CountryListDto GetCountryById(string countryId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(countryId);
             var country = Countries.GetWhere(_ => _.Id == Guid.Parse(countryId)).FirstOrDefault();
+
             return country != null ? _mapper.Map<CountryListDto>(country) : null;
         }
 
@@ -47,13 +52,17 @@ namespace ECommerce.Business.Services.ReadServices
 
         public CountryListDto GetCitiesByCountryId(string countryId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(countryId);
             var cities = Countries.GetWhere(_ => _.Id == Guid.Parse(countryId), false, _ => _.Cities).FirstOrDefault();
+
             return cities != null ? _mapper.Map<CountryListDto>(cities) : null;
         }
 
         public CityListDto GetDistrictsByCityId(string cityId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(cityId);
             var districts = Cities.GetWhere(_ => _.Id == Guid.Parse(cityId), false, _ => _.Districts).FirstOrDefault();
+
             return districts != null ? _mapper.Map<CityListDto>(districts) : null;
         }
     }

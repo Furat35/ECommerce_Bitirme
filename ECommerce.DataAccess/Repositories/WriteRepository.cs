@@ -54,6 +54,12 @@ namespace ECommerce.DataAccess.Repositories
             return await SaveChangesAsync();
         }
 
+        public async Task<bool> UpdateRangeAsync(List<TEntity> models)
+        {
+            Table.UpdateRange(models);
+            return await SaveChangesAsync();
+        }
+
         public async Task<bool> SaveChangesAsync()
             => await _context.SaveChangesAsync() != 0;
     }

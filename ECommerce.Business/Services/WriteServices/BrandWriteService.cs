@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ECommerce.Business.Extensions;
 using ECommerce.Business.Models.Dtos.Brands;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Business.Services.Contracts.IWriteServices;
@@ -6,6 +7,7 @@ using ECommerce.Core.DataAccess.Repositories.Abstract;
 using ECommerce.Core.Exceptions;
 using ECommerce.DataAccess.UnitOfWorks;
 using ECommerce.Entity.Entities;
+using FluentValidation;
 
 namespace ECommerce.Business.Services.WriteServices
 {
@@ -14,6 +16,8 @@ namespace ECommerce.Business.Services.WriteServices
         private readonly IWriteRepository<Brand> _brandWriteRepository;
         private readonly IBrandReadService _brandReadService;
         private readonly IMapper _mapper;
+        private readonly IValidator<BrandAddDto> _brandAddDtoValidator;
+        private readonly IValidator<BrandUpdateDto> _brandUpdateDtoValidator;
 
         public BrandWriteService(IUnitOfWork unitOfWork, IMapper mapper, IBrandReadService brandReadService)
         {
@@ -24,8 +28,10 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<BrandListDto> AddBrandAsync(BrandAddDto brand)
         {
+            await CustomFluentValidationErrorHandling.ValidateAndThrowAsync(brand, _brandAddDtoValidator);
             await ActivateBrandIfDeleted(brand.Name);
             var brandToAdd = _mapper.Map<Brand>(brand);
+            brandToAdd.IsValid = true;
             bool isAdded = await _brandWriteRepository.AddAsync(brandToAdd);
             if (!isAdded)
                 throw new InternalServerErrorException();
@@ -42,6 +48,7 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> UpdateBrandAsync(BrandUpdateDto brand)
         {
+            await CustomFluentValidationErrorHandling.ValidateAndThrowAsync(brand, _brandUpdateDtoValidator);
             var brandToUpdate = await GetSingleBrand(brand.Id);
             _mapper.Map(brand, brandToUpdate);
 
@@ -50,6 +57,7 @@ namespace ECommerce.Business.Services.WriteServices
 
         private async Task<Brand> GetSingleBrand(string brandId)
         {
+            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(brandId);
             var brand = await _brandReadService.Brands.GetByIdAsync(brandId);
             if (brand is null || !brand.IsValid)
                 throw new NotFoundException("Marka bulunamadı!");

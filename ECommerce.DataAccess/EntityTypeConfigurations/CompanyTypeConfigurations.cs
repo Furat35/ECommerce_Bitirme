@@ -19,8 +19,6 @@ namespace ECommerce.DataAccess.EntityTypeConfigurations
                .IsRequired();
             builder.Property(_ => _.AboutCompany)
                .IsRequired();
-            builder.Property(_ => _.UserId)
-               .IsRequired();
         }
     }
 }

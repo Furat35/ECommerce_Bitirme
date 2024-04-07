@@ -23,11 +23,9 @@ namespace ECommerce.Business.Helpers.FilterServices
             _users = NameStartsWith(filters.Name);
             _users = MailStartsWith(filters.Mail);
 
-            int pageNumber;
-            if (_users.Count() > filters.PageSize)
-                pageNumber = _users.Count() % filters.PageSize == 0 ? _users.Count() / filters.PageSize : _users.Count() / filters.PageSize + 1;
-            else
-                pageNumber = 1;
+            int pageNumber = _users.Count() % filters.PageSize == 0
+                ? _users.Count() / filters.PageSize
+                : _users.Count() / filters.PageSize + 1;
             Metadata metadata = new(filters.Page, filters.PageSize, _users.Count(), pageNumber);
             _users = AddPagination(filters);
             var header = new CustomHeaders().AddPaginationHeader(metadata);
@@ -39,6 +37,7 @@ namespace ECommerce.Business.Helpers.FilterServices
                 Headers = header
             };
         }
+
 
         private IQueryable<User> NameStartsWith(string name)
            => !string.IsNullOrEmpty(name)
@@ -53,7 +52,7 @@ namespace ECommerce.Business.Helpers.FilterServices
         private IQueryable<User> AddPagination(UserRequestFilter filters)
            => _users
                .OrderBy(_ => _.Name)
-               .Skip(filters.Page * filters.PageSize)
+               .Skip((filters.Page - 1) * filters.PageSize)
                .Take(filters.PageSize);
     }
 }

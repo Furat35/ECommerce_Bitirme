@@ -9,6 +9,7 @@ namespace ECommerce.Business.Mappings
         public ShippingPlaceProfile()
         {
             CreateMap<ShippingPlaceCheckoutDto, ShippingPlace>();
+            CreateMap<ShippingPlace, ShippingPlaceListDto>();
         }
     }
 }

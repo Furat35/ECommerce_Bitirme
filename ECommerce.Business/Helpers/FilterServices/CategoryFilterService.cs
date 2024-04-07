@@ -23,10 +23,7 @@ namespace ECommerce.Business.Helpers.FilterServices
         {
             _categories = NameStartsWith(filters.Name);
             int pageNumber;
-            if (_categories.Count() > filters.PageSize)
-                pageNumber = _categories.Count() % filters.PageSize == 0 ? _categories.Count() / filters.PageSize : _categories.Count() / filters.PageSize + 1;
-            else
-                pageNumber = 1;
+            pageNumber = _categories.Count() % filters.PageSize == 0 ? _categories.Count() / filters.PageSize : _categories.Count() / filters.PageSize + 1;
             Metadata metadata = new(filters.Page, filters.PageSize, _categories.Count(), pageNumber);
             _categories = AddPagination(filters);
             var header = new CustomHeaders().AddPaginationHeader(metadata);
@@ -47,7 +44,7 @@ namespace ECommerce.Business.Helpers.FilterServices
         private IQueryable<Category> AddPagination(CategoryRequestFilter filters)
           => _categories
               .OrderBy(_ => _.Name)
-              .Skip(filters.Page * filters.PageSize)
+              .Skip((filters.Page - 1) * filters.PageSize)
               .Take(filters.PageSize);
     }
 }

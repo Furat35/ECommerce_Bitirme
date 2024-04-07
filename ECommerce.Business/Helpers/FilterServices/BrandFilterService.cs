@@ -23,11 +23,7 @@ namespace ECommerce.Business.Helpers.FilterServices
         {
             _brands = NameStartsWith(filters.Name);
 
-            int pageNumber;
-            if (_brands.Count() > filters.PageSize)
-                pageNumber = _brands.Count() % filters.PageSize == 0 ? _brands.Count() / filters.PageSize : _brands.Count() / filters.PageSize + 1;
-            else
-                pageNumber = 1;
+            int pageNumber = _brands.Count() % filters.PageSize == 0 ? _brands.Count() / filters.PageSize : _brands.Count() / filters.PageSize + 1;
             Metadata metadata = new(filters.Page, filters.PageSize, _brands.Count(), pageNumber);
             _brands = AddPagination(filters);
             var header = new CustomHeaders().AddPaginationHeader(metadata);
@@ -48,7 +44,7 @@ namespace ECommerce.Business.Helpers.FilterServices
         private IQueryable<Brand> AddPagination(BrandRequestFilter filters)
           => _brands
               .OrderBy(_ => _.Name)
-              .Skip(filters.Page * filters.PageSize)
+              .Skip((filters.Page - 1) * filters.PageSize)
               .Take(filters.PageSize);
 
     }

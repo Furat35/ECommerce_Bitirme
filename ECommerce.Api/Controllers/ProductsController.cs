@@ -1,9 +1,7 @@
-﻿using ECommerce.Business.ActionFilters;
-using ECommerce.Business.Helpers.Products;
+﻿using ECommerce.Business.Helpers.Products;
 using ECommerce.Business.Models.Dtos.Products;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Business.Services.Contracts.IWriteServices;
-using ECommerce.Business.Validations.FluentValidations.Products;
 using ECommerce.Core.Consts;
 using ECommerce.Core.Exceptions;
 using ECommerce.Core.Extensions;
@@ -38,7 +36,7 @@ namespace ECommerce.Api.Controllers
         public IActionResult GetProducts([FromQuery] ProductRequestFilter productRequestFilter)
         {
             var products = _productReadService.GetProductsWhere(productRequestFilter, _ => _.IsValid);
-            return Ok(products.FirstOrDefault().Images);
+            return Ok(products);
         }
 
         /// <summary>
@@ -47,7 +45,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="id">Ürün id'si</param>
         /// <returns>Verilen id'deki ürün</returns>
         [HttpGet("{id}", Name = "GetProductById")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         public async Task<IActionResult> GetProductById(string id)
         {
             var product = await _productReadService.GetProductIdAsync(id);
@@ -61,8 +58,7 @@ namespace ECommerce.Api.Controllers
         /// <returns>Eklenen ürün</returns>
         [HttpPost(Name = "AddProduct")]
         [Authorize(Roles = $"{RoleConsts.Company}")]
-        [TypeFilter(typeof(FluentValidationFilterAttribute<ProductAddDtoValidator, ProductAddDto>), Arguments = ["product"])]
-        public async Task<IActionResult> AddProduct([FromForm] ProductAddDto product)
+        public async Task<IActionResult> AddProduct([FromBody] ProductAddDto product)
         {
             var response = await _productWriteService.AddProductAsync(product);
             return CreatedAtRoute("GetProductById", new { id = response.Id }, response);
@@ -75,7 +71,6 @@ namespace ECommerce.Api.Controllers
         /// <returns>Ok</returns>
         [HttpPost("img/{productId}")]
         [Authorize(Roles = $"{RoleConsts.Company}")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["productId"])]
         public async Task<IActionResult> UploadProductPhoto(string productId)
         {
             await IsCompaniesProduct(productId);
@@ -85,6 +80,33 @@ namespace ECommerce.Api.Controllers
         }
 
         /// <summary>
+        /// Ürün onaylama
+        /// </summary>
+        /// <param name="productId">ürün id'si</param>
+        /// <returns>İşlemin başarılı olup olmadığı</returns>
+        [HttpPost("confirm/{productId}")]
+        [Authorize(Roles = $"{RoleConsts.Admin}")]
+        public async Task<IActionResult> ConfirmProductToBeAdded(string productId)
+        {
+            bool isConfirmed = await _productWriteService.ConfirmProductToAdded(productId);
+            return Ok(isConfirmed);
+        }
+
+
+        /// <summary>
+        /// Tüm ürünleri onaylama
+        /// </summary>
+        /// <returns>İşlemin başarılı olup olmadığı</returns>
+        [HttpPost("confirm")]
+        [Authorize(Roles = $"{RoleConsts.Admin}")]
+        public async Task<IActionResult> ConfirmProductToBeAdded()
+        {
+            var isConfirmed = await _productWriteService.ConfirmAllProductsToAdded();
+            return Ok(isConfirmed);
+        }
+
+
+        /// <summary>
         /// Ürün foroğrafı silme
         /// </summary>
         /// <param name="productId">Fotoğrafı silinecek ürünün id'si</param>
@@ -92,7 +114,6 @@ namespace ECommerce.Api.Controllers
         /// <returns>Ok</returns>
         [HttpDelete("img/{productId}/{imageId}")]
         [Authorize(Roles = $"{RoleConsts.Company}")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = new object[] { new string[] { "productId", "imageId" } })]
         public async Task<IActionResult> RemoveProductPhoto(string productId, string imageId)
         {
             await IsCompaniesProduct(productId);
@@ -107,7 +128,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="product">Güncellenecek ürün detayları</param>
         /// <returns>Güncellenen ürün</returns>
         [HttpPut(Name = "UpdateProduct")]
-        [TypeFilter(typeof(FluentValidationFilterAttribute<ProductUpdateDtoValidator, ProductUpdateDto>), Arguments = ["product"])]
         [Authorize(Roles = $"{RoleConsts.Company}")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductUpdateDto product)
         {
@@ -123,7 +143,6 @@ namespace ECommerce.Api.Controllers
         /// <param name="id">Silinecek ürün</param>
         /// <returns>Ok</returns>
         [HttpDelete("{id}", Name = "DeleteProduct")]
-        [TypeFilter(typeof(ModelValidationFilterAttribute), Arguments = ["id"])]
         [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company}")]
         public async Task<IActionResult> DeleteProduct(string id)
         {
