@@ -32,7 +32,7 @@ namespace ECommerce.Business.Services.ReadServices
 
         public IReadRepository<Product> Products { get; }
 
-        public async Task<ProductListDto> GetProductIdAsync(string productId)
+        public async Task<ProductListDto> GetProductByIdAsync(string productId)
         {
             ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(productId);
             var product = await Products.GetByIdAsync(productId, includeProperties: [_ => _.SubCategory, _ => _.SubCategory.Category, _ => _.Brand, _ => _.ProductPhotos]);

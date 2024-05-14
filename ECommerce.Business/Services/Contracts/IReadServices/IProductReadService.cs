@@ -9,7 +9,7 @@ namespace ECommerce.Business.Services.Contracts.IReadServices
     public interface IProductReadService
     {
         List<ProductListDto> GetProductsWhere(ProductRequestFilter filters, Expression<Func<Product, bool>> predicate);
-        Task<ProductListDto> GetProductIdAsync(string productId);
+        Task<ProductListDto> GetProductByIdAsync(string productId);
         Task<ProductListDto> GetSingleProductAsync(Expression<Func<Product, bool>> predicate);
         Task<bool> IsCompaniesProduct(string productId, string companyId);
         IReadRepository<Product> Products { get; }

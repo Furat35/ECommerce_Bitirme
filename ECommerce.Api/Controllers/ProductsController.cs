@@ -47,7 +47,7 @@ namespace ECommerce.Api.Controllers
         [HttpGet("{id}", Name = "GetProductById")]
         public async Task<IActionResult> GetProductById(string id)
         {
-            var product = await _productReadService.GetProductIdAsync(id);
+            var product = await _productReadService.GetProductByIdAsync(id);
             return Ok(product);
         }
 

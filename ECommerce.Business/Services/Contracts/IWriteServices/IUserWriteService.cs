@@ -9,6 +9,7 @@ namespace ECommerce.Business.Services.Contracts.IWriteServices
     {
         Task<bool> UpdateUserPasswordAsync(string password);
         Task<bool> UpdateAddress(AddressUpdateDto addressUpdateDto);
+        Task<bool> UpdateUser(UserUpdateDto userUpdateDto, string userId);
         Task<bool> SafeDeleteUserAsync(string userId);
         Task<bool> AddUserAsync(UserAddDto user);
         Task<bool> ActivateUserAsync(string userId);

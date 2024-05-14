@@ -26,6 +26,7 @@ namespace ECommerce.Business.Services.WriteServices
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPasswordGenerationService _passwordGenerationService;
         private readonly IValidator<UserAddDto> _userAddDtoValidator;
+        private readonly IValidator<UserUpdateDto> _userUpdateDtoValidator;
         private readonly IValidator<AddressUpdateDto> _addressUpdateDtoValidator;
 
         public UserWriteService(IMapper mapper, IUnitOfWork unitOfWork, IUserReadService userReadService,
@@ -62,6 +63,15 @@ namespace ECommerce.Business.Services.WriteServices
                 return true;
 
             return await _userWriteRepository.SafeRemoveAsync(user);
+        }
+
+        public async Task<bool> UpdateUser(UserUpdateDto userUpdateDto, string userId)
+        {
+            await CustomFluentValidationErrorHandling.ValidateAndThrowAsync(userUpdateDto, _userUpdateDtoValidator);
+            var user = await GetSingleUser(userId);
+            _mapper.Map(userUpdateDto, user);
+
+            return await _userWriteRepository.UpdateAsync(user);
         }
 
         public async Task<bool> UpdateUserPasswordAsync(string password)

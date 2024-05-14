@@ -19,11 +19,13 @@ namespace ECommerce.Business.Services.WriteServices
         private readonly IValidator<BrandAddDto> _brandAddDtoValidator;
         private readonly IValidator<BrandUpdateDto> _brandUpdateDtoValidator;
 
-        public BrandWriteService(IUnitOfWork unitOfWork, IMapper mapper, IBrandReadService brandReadService)
+        public BrandWriteService(IUnitOfWork unitOfWork, IMapper mapper, IBrandReadService brandReadService, IValidator<BrandAddDto> brandAddDtoValidator, IValidator<BrandUpdateDto> brandUpdateDtoValidator)
         {
             _brandWriteRepository = unitOfWork.GetWriteRepository<Brand>();
             _mapper = mapper;
             _brandReadService = brandReadService;
+            _brandAddDtoValidator = brandAddDtoValidator;
+            _brandUpdateDtoValidator = brandUpdateDtoValidator;
         }
 
         public async Task<BrandListDto> AddBrandAsync(BrandAddDto brand)

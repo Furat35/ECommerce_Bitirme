@@ -37,7 +37,7 @@ namespace ECommerce.Business.Services.WriteServices
                 cartItems.Quantity += cartItemAddDto.Quantity;
             else
             {
-                var product = await _productReadService.GetProductIdAsync(cartItemAddDto.ProductId);
+                var product = await _productReadService.GetProductByIdAsync(cartItemAddDto.ProductId);
                 var newCartItem = new CartItem
                 {
                     ProductId = product.Id,

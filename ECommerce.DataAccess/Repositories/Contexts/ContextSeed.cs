@@ -52,7 +52,7 @@ namespace ECommerce.DataAccess.Repositories.Contexts
                 new User{ Id = Guid.Parse("48df4af4-aa79-45f2-755c-08dc51134e88"), Name = "Company", Surname = "cc", Mail = "company@gmail.com", Phone = "5375655978",
                     Password = "war/WAa0EzB/LCXYZnjXzWp/nZ5DxsExyKhXhSM5HEI=", PasswordSalt = "bzl9bkpd2l3s2N/yWbMFww==", Role = Entity.Enums.Role.Company,
                     Company = new Company{ Mail = "rewr@gmail.com", CompanyName = "test comp", AboutCompany = "about comp", Phone= "52325523"} , CreatedDate = DateTime.Now, IsValid = true},
-                  new User{ Id = Guid.Parse("321EAB18-CA1E-475A-B5E1-06871BB5D8D1"), Name = "Admin", Surname = "aa", Mail = "admin@gmail.com", Phone = "523525325", 
+                  new User{ Id = Guid.Parse("321EAB18-CA1E-475A-B5E1-06871BB5D8D1"), Name = "Admin", Surname = "aa", Mail = "admin@gmail.com", Phone = "523525325",
                       Password = "war/WAa0EzB/LCXYZnjXzWp/nZ5DxsExyKhXhSM5HEI=", PasswordSalt = "bzl9bkpd2l3s2N/yWbMFww==", Role = Entity.Enums.Role.Admin, CreatedDate = DateTime.Now, IsValid = true},
                     new User{ Id = Guid.Parse("621EAB18-CA1E-475A-B5E1-06871BB5D8D1"), Name = "User", Surname = "uu", Mail = "user@gmail.com", Phone = "523525325",
                       Password = "war/WAa0EzB/LCXYZnjXzWp/nZ5DxsExyKhXhSM5HEI=", PasswordSalt = "bzl9bkpd2l3s2N/yWbMFww==", Role = Entity.Enums.Role.User, CreatedDate = DateTime.Now, IsValid = true,

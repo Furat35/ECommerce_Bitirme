@@ -1,5 +1,6 @@
 ﻿using ECommerce.Business.Helpers.Users;
 using ECommerce.Business.Models.Dtos.Addresses;
+using ECommerce.Business.Models.Dtos.Users;
 using ECommerce.Business.Services.Contracts.IReadServices;
 using ECommerce.Business.Services.Contracts.IWriteServices;
 using ECommerce.Core.Consts;
@@ -77,6 +78,23 @@ namespace ECommerce.Api.Controllers
             }
 
             throw new ForbiddenException();
+        }
+
+        /// <summary>
+        /// Kullanıcı bilgileri güncelleme
+        /// </summary>
+        /// <param name="user">Kullanıcı bilgileri</param>
+        /// <returns>İşlem başarılı olup olmadığı</returns>
+        [HttpPut("data", Name = "UpdateData")]
+        [Authorize(Roles = $"{RoleConsts.Admin},{RoleConsts.Company},{RoleConsts.User}")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDto user)
+        {
+            var userId = HttpContext.User.GetActiveUserId();
+            if (!User.GetActiveUserId().Equals(userId, StringComparison.InvariantCultureIgnoreCase))
+                throw new ForbiddenException();
+
+            var updateResult = await _userWriteService.UpdateUser(user, userId);
+            return Ok(updateResult);
         }
 
         /// <summary>

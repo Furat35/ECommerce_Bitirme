@@ -68,7 +68,6 @@ namespace ECommerce.Business.Services.WriteServices
 
         public async Task<bool> SafeRemoveProductAsync(string productId)
         {
-            ModelValidations.ThrowBadRequestIfIdIsNotValidGuid(productId);
             var product = await GetSingleProductIncludeProductPhotos(productId, true);
             bool isDeleted = await _productWriteRepository.SafeRemoveAsync(product);
             if (isDeleted && product.ProductPhotos != null)
